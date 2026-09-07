@@ -1,3 +1,12 @@
+export interface Comment {
+  id: string;
+  author: string;
+  avatarUrl?: string;
+  content: string;
+  createdAt?: string | number;
+  likes?: number;
+}
+
 export interface Novel {
   id: string;
   title: string;
@@ -7,6 +16,8 @@ export interface Novel {
   description?: string;
   sourceUrl: string;
   sourceId: string;
+  sourceName?: string;
+  rating?: number;
   totalChapters?: number;
   status: 'ongoing' | 'completed' | 'hiatus' | 'unknown';
   genres: string[];
@@ -35,6 +46,9 @@ export interface LibraryItem {
   coverUrl?: string;
   sourceUrl: string;
   sourceId: string;
+  sourceName?: string;
+  rating?: number;
+  totalChapters?: number;
   addedAt: number;
   updatedAt: number;
   favorite: boolean;
@@ -58,7 +72,10 @@ export interface Bookmark {
   chapterId: string;
   chapterNumber: number;
   title: string;
+  sourceUrl?: string;
+  sourceName?: string;
   note?: string;
+  scrollPosition?: number;
   createdAt: number;
 }
 
@@ -120,12 +137,15 @@ export interface NovelSearchResult {
   coverUrl?: string;
   description?: string;
   sourceId: string;
+  sourceName?: string;
   sourceUrl: string;
+  rating?: number;
   downloadCount?: number;
 }
 
 export interface NovelDetails extends Novel {
   chapters: Chapter[];
+  comments?: Comment[];
   downloadCount?: number;
   languages?: string[];
   bookshelves?: string[];

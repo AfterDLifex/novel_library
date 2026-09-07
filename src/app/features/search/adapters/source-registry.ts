@@ -5,6 +5,17 @@ import { SourceConfig } from './source.interface';
  * Each source provides metadata and search capabilities.
  */
 export const NOVEL_SOURCES: SourceConfig[] = [
+  // Jikan API (MyAnimeList Light Novels Database) - Free public API
+  {
+    id: 'jikan',
+    name: 'Jikan (MyAnimeList Light Novels)',
+    baseUrl: 'https://api.jikan.moe/v4',
+    searchEndpoint: '/manga?type=lightnovel&q={query}',
+    detailsEndpoint: '/manga/{id}',
+    isContentPermitted: true,
+    headers: { 'Accept': 'application/json' },
+    isJsonApi: true
+  },
   // Gutendex / Project Gutenberg - Free public domain books via JSON API
   {
     id: 'gutendex',

@@ -14,7 +14,7 @@
  */
 const express = require('express');
 const cors = require('cors');
-const { listSources, searchSource, getDetails } = require('./sources');
+const { listSources, searchSource, getDetails, getChapters, getChapterContent, getComments } = require('./sources');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -91,6 +91,66 @@ app.get('/api/details', async (req, res) => {
   } catch (err) {
     console.error(`[details] ${source} ${id}:`, err.message);
     res.status(502).json({ error: `Details failed for "${source}/${id}": ${err.message}` });
+  }
+});
+
+app.get('/api/chapters', async (req, res) => {
+  const { source, id } = req.query;
+  if (!source || !id) {
+    return res.status(400).json({ error: 'Missing "source" or "id" query parameter' });
+  }
+
+  const cacheKey = `chapters:${source}:${id}`;
+  const cached = cacheGet(cacheKey);
+  if (cached) return res.json(cached);
+
+  try {
+    const chapters = await getChapters(String(source), String(id));
+    cacheSet(cacheKey, chapters);
+    res.json(chapters);
+  } catch (err) {
+    console.error(`[chapters] ${source} ${id}:`, err.message);
+    res.status(502).json({ error: `Chapters failed for "${source}/${id}": ${err.message}` });
+  }
+});
+
+app.get('/api/chapter-content', async (req, res) => {
+  const { source, novelId, chapterId } = req.query;
+  if (!source || !novelId || !chapterId) {
+    return res.status(400).json({ error: 'Missing "source", "novelId", or "chapterId" parameter' });
+  }
+
+  const cacheKey = `content:${source}:${novelId}:${chapterId}`;
+  const cached = cacheGet(cacheKey);
+  if (cached) return res.json(cached);
+
+  try {
+    const content = await getChapterContent(String(source), String(novelId), String(chapterId));
+    cacheSet(cacheKey, content);
+    res.json(content);
+  } catch (err) {
+    console.error(`[chapter-content] ${source} ${novelId} ${chapterId}:`, err.message);
+    res.status(502).json({ error: `Chapter content failed: ${err.message}` });
+  }
+});
+
+app.get('/api/comments', async (req, res) => {
+  const { source, id } = req.query;
+  if (!source || !id) {
+    return res.status(400).json({ error: 'Missing "source" or "id" query parameter' });
+  }
+
+  const cacheKey = `comments:${source}:${id}`;
+  const cached = cacheGet(cacheKey);
+  if (cached) return res.json(cached);
+
+  try {
+    const comments = await getComments(String(source), String(id));
+    cacheSet(cacheKey, comments);
+    res.json(comments);
+  } catch (err) {
+    console.error(`[comments] ${source} ${id}:`, err.message);
+    res.status(502).json({ error: `Comments failed for "${source}/${id}": ${err.message}` });
   }
 });
 

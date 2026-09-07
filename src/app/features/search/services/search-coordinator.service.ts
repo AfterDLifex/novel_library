@@ -1,4 +1,4 @@
-﻿import { Injectable, signal } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import {
   NovelSearchResult,
   NovelDetails,
@@ -73,7 +73,7 @@ export class SearchCoordinatorService {
     const enabled = !!s.backendProxyEnabled;
     const backendUrl = (s.backendProxyUrl || DEFAULT_BACKEND_URL).replace(/\/$/, '');
 
-    const backendIds = ['royalroad', 'syosetu', 'novelfull', 'lightnovelworld', 'novelupdates'];
+    const backendIds = ['jikan', 'royalroad', 'syosetu', 'novelfull', 'lightnovelworld', 'novelupdates'];
 
     if (enabled) {
       // Remove direct adapters for proxied sources, add backend adapters.
@@ -239,10 +239,23 @@ export class SearchCoordinatorService {
     return chapters;
   }
 
+  async getChapterContent(novelId: string, chapterId: string): Promise<{ title: string; content: string; sourceUrl?: string }> {
+    const { sourceId, sourceNovelId } = this.parseNovelId(novelId);
+    const source = this._sources().find((s) => s.id === sourceId);
+
+    if (source && 'getChapterContent' in source) {
+      return (source as any).getChapterContent(sourceNovelId, chapterId);
+    }
+    return {
+      title: `Chapter ${chapterId}`,
+      content: '<p>Content preview not available directly. Please view on the novel source website.</p>'
+    };
+  }
+
   private parseNovelId(id: string): { sourceId: string; sourceNovelId: string } {
     const parts = id.split(':');
     if (parts.length >= 3 && parts[0] === 'novel') {
-      return { sourceId: parts[1], sourceNovelId: parts[2] };
+      return { sourceId: parts[1], sourceNovelId: parts.slice(2).join(':') };
     }
     return { sourceId: 'mock', sourceNovelId: id };
   }

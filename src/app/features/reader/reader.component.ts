@@ -102,13 +102,23 @@ export class ReaderComponent implements OnInit, OnDestroy {
       const all = await this.coordinator.getChapters(this.novelIdVal);
       this.chapters.set(all);
 
-      const ch = all.find(c => c.id === this.chapterId);
+      let ch = all.find(c => c.id === this.chapterId);
+
+      if (!ch && all.length > 0) {
+        ch = all[0];
+        this.router.navigate(['/reader', this.novelIdVal, all[0].id]);
+      }
 
       if (ch) {
+        if (!ch.content) {
+          try {
+            const fetched = await this.coordinator.getChapterContent(this.novelIdVal, ch.id);
+            ch = { ...ch, content: fetched.content, title: fetched.title || ch.title };
+          } catch {
+            /* keep base chapter details */
+          }
+        }
         this.currentChapter.set(ch);
-      } else if (all.length > 0) {
-        this.currentChapter.set(all[0]);
-        this.router.navigate(['/reader', this.novelIdVal, all[0].id]);
       }
     } catch (e) {
       this.error.set(e instanceof Error ? e.message : String(e));

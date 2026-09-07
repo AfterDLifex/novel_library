@@ -27,6 +27,17 @@
               <app-icon name="bookOpen" [size]="14" />
               {{ details()?.totalChapters ?? details()?.chapters?.length ?? 0 }} Chapters
             </span>
+            @if (details()?.sourceName || details()?.sourceId) {
+              <span class="badge badge-outline">
+                <app-icon name="globe" [size]="14" />
+                {{ details()?.sourceName || details()?.sourceId }}
+              </span>
+            }
+            @if (details()?.rating) {
+              <span class="badge badge-warning">
+                <app-icon name="star" [size]="14" /> {{ details()?.rating }} / 5.0
+              </span>
+            }
           </div>
 
           <h1 class="title">{{ details()?.title }}</h1>
@@ -43,12 +54,18 @@
 
           <div class="action-buttons">
             <button class="btn-primary glass-btn lift" (click)="startReading()">
-              <app-icon name="arrowForward" [size]="18" /> Continue / Read Now
+              <app-icon name="arrowForward" [size]="18" /> Read / Start Chapter
             </button>
 
             <button class="btn-secondary glass-btn lift" (click)="addToLibrary()">
               <app-icon name="add" [size]="18" /> Save to Library
             </button>
+
+            @if (details()?.sourceUrl) {
+              <a [href]="details()?.sourceUrl" target="_blank" rel="noopener" class="btn-secondary glass-btn lift" title="Open original novel website link">
+                <app-icon name="openInNew" [size]="18" /> Original Source Site
+              </a>
+            }
 
             <button class="btn-icon glass-btn lift" (click)="toggleFavorite()" [title]="isFavorite() ? 'Remove Favorite' : 'Mark Favorite'">
               <app-icon [name]="isFavorite() ? 'star' : 'starBorder'" [size]="20" [class.fav]="isFavorite()" />
@@ -62,7 +79,7 @@
     @if (details()?.description) {
       <section class="description-section glass-strong">
         <h2 class="section-title">
-          <app-icon name="book" [size]="20" /> Synopsis
+          <app-icon name="book" [size]="20" /> Synopsis & Overview
         </h2>
         <p class="description-text" [class.expanded]="expandedDescription">
           {{ details()?.description }}
@@ -87,6 +104,29 @@
         [novelId]="novelId()"
         (chapterSelected)="openReader($event)"
       />
+    </section>
+
+    <!-- Comments & Reviews Section -->
+    <section class="comments-section glass-strong">
+      <div class="comments-header">
+        <h2 class="section-title">
+          <app-icon name="chat" [size]="20" /> Reader Comments & Community Reviews ({{ details()?.comments?.length || 0 }})
+        </h2>
+      </div>
+
+      @if (details()?.comments?.length) {
+        <div class="comments-list">
+          <div class="comment-card glass" *ngFor="let comment of details()?.comments">
+            <div class="comment-header">
+              <span class="comment-author"><app-icon name="person" [size]="16" /> {{ comment.author }}</span>
+              <span class="comment-date">{{ comment.createdAt }}</span>
+            </div>
+            <p class="comment-body">{{ comment.content }}</p>
+          </div>
+        </div>
+      } @else {
+        <p class="no-comments">No reader comments loaded for this novel yet.</p>
+      }
     </section>
   }
 </div>
