@@ -9,7 +9,7 @@ export class HttpSourceAdapter implements NovelSourceAdapter {
   readonly id: string;
   readonly name: string;
   readonly isContentPermitted: boolean;
-  private readonly config: SourceConfig;
+  protected readonly config: SourceConfig;
 
   constructor(config: SourceConfig) {
     this.config = config;

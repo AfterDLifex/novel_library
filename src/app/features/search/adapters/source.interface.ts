@@ -10,6 +10,8 @@ export interface SourceConfig {
   chaptersEndpoint?: string;
   isContentPermitted: boolean;
   headers?: Record<string, string>;
+  /** Whether this source uses a JSON API (true) or HTML scraping (false) */
+  isJsonApi?: boolean;
 }
 
 /** Adapter interface for novel search sources. */

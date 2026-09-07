@@ -23,6 +23,7 @@ export interface Chapter {
   sourceUrl: string;
   publishedAt?: number;
   createdAt: number;
+  isContentAvailable?: boolean;
 }
 
 export interface LibraryItem {
@@ -116,10 +117,14 @@ export interface NovelSearchResult {
   description?: string;
   sourceId: string;
   sourceUrl: string;
+  downloadCount?: number;
 }
 
 export interface NovelDetails extends Novel {
   chapters: Chapter[];
+  downloadCount?: number;
+  languages?: string[];
+  bookshelves?: string[];
 }
 
 export interface CachedEntry {

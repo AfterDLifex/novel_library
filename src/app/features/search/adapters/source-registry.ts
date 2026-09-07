@@ -5,6 +5,18 @@ import { SourceConfig } from './source.interface';
  * Each source provides metadata and search capabilities.
  */
 export const NOVEL_SOURCES: SourceConfig[] = [
+  // Gutendex / Project Gutenberg - Free public domain books via JSON API
+  {
+    id: 'gutendex',
+    name: 'Project Gutenberg (Gutendex)',
+    baseUrl: 'https://gutendex.com',
+    searchEndpoint: '/books?search={query}',
+    detailsEndpoint: '/books/{id}',
+    isContentPermitted: true,
+    headers: { 'Accept': 'application/json' },
+    isJsonApi: true
+  },
+  // Other sources (HTML scraping-based, may not work reliably due to bot protection)
   {
     id: 'novelupdates',
     name: 'NovelUpdates',

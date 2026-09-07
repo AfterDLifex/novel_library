@@ -9,7 +9,9 @@ import { normalizeTitle } from '../../../core/utils/normalize.util';
 import { generateNovelId } from '../../../core/utils/id.util';
 import { NovelSourceAdapter, SourceConfig } from '../adapters/source.interface';
 import { HttpSourceAdapter } from '../adapters/http-source.adapter';
+import { JsonApiAdapter } from '../adapters/json-api.adapter';
 import { NOVEL_SOURCES } from '../adapters/source-registry';
+import { GutendexAdapter } from '../adapters/gutendex.adapter';
 
 /**
  * Search coordinator that manages multiple source adapters.
@@ -33,7 +35,13 @@ export class SearchCoordinatorService {
   readonly activeSourceIds = this._activeSourceIds.asReadonly();
 
   constructor(private cache: LocalCacheService) {
-    this.registerSource(new MockSearchAdapter());
+    // Register mock adapter for testing
+    // this.registerSource(new MockSearchAdapter());
+    
+    // Register the Gutendex adapter (this provides real data!)
+    this.registerSource(new GutendexAdapter());
+    
+    // Register other online sources from config
     this.registerOnlineSources();
   }
 
@@ -49,7 +57,10 @@ export class SearchCoordinatorService {
   }
 
   registerFromConfig(config: SourceConfig): void {
-    const adapter = new HttpSourceAdapter(config);
+    // Use JsonApiAdapter for JSON API sources, HttpSourceAdapter for HTML scraping
+    const adapter = config.isJsonApi 
+      ? new JsonApiAdapter(config) 
+      : new HttpSourceAdapter(config);
     this.registerSource(adapter);
   }
 
@@ -140,6 +151,7 @@ export class SearchCoordinatorService {
       description: (a.description?.length || 0) >= (b.description?.length || 0) ? a.description : b.description,
       sourceId: a.sourceId,
       sourceUrl: a.sourceUrl,
+      downloadCount: a.downloadCount || b.downloadCount,
     };
   }
 
