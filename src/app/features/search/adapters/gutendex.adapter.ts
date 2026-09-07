@@ -38,6 +38,7 @@ export class GutendexAdapter implements NovelSourceAdapter {
   readonly id = 'gutendex';
   readonly name = 'Project Gutenberg (Gutendex)';
   readonly isContentPermitted = true;
+  readonly stable = true;
 
   private readonly baseUrl = 'https://gutendex.com';
 

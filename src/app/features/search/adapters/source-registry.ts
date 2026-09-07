@@ -5,7 +5,20 @@ import { SourceConfig } from './source.interface';
  * Each source provides metadata and search capabilities.
  */
 export const NOVEL_SOURCES: SourceConfig[] = [
-  // Jikan API (MyAnimeList Light Novels Database) - Free public API
+  // Open Library - Free public JSON API, no key, CORS enabled, direct from the browser.
+  // Reliable default: rich metadata + public-domain full-text (Internet Archive/Gutenberg).
+  {
+    id: 'openlibrary',
+    name: 'Open Library',
+    baseUrl: 'https://openlibrary.org',
+    searchEndpoint: '/search.json',
+    detailsEndpoint: '/works/{id}.json',
+    isContentPermitted: true,
+    headers: { 'Accept': 'application/json' },
+    isJsonApi: true,
+    stable: true
+  },
+  // Jikan API (MyAnimeList Light Novels Database) - Free public JSON API (rate-limited)
   {
     id: 'jikan',
     name: 'Jikan (MyAnimeList Light Novels)',
@@ -14,9 +27,11 @@ export const NOVEL_SOURCES: SourceConfig[] = [
     detailsEndpoint: '/manga/{id}',
     isContentPermitted: true,
     headers: { 'Accept': 'application/json' },
-    isJsonApi: true
+    isJsonApi: true,
+    stable: true
   },
-  // Gutendex / Project Gutenberg - Free public domain books via JSON API
+  // Gutendex / Project Gutenberg - Free public domain books via JSON API.
+  // Reliable default; direct from browser, works even when scraping sources fail.
   {
     id: 'gutendex',
     name: 'Project Gutenberg (Gutendex)',
@@ -25,9 +40,11 @@ export const NOVEL_SOURCES: SourceConfig[] = [
     detailsEndpoint: '/books/{id}',
     isContentPermitted: true,
     headers: { 'Accept': 'application/json' },
-    isJsonApi: true
+    isJsonApi: true,
+    stable: true
   },
-  // Other sources (HTML scraping-based, may not work reliably due to bot protection)
+  // HTML scraping-based sources below are kept selectable by the user, but are NOT
+  // enabled by default because many sit behind bot protection (Cloudflare) and fail.
   {
     id: 'novelupdates',
     name: 'NovelUpdates',
@@ -36,6 +53,7 @@ export const NOVEL_SOURCES: SourceConfig[] = [
     detailsEndpoint: '/series/{id}/',
     isContentPermitted: false,
     headers: { 'Accept': 'text/html,application/xhtml+xml' },
+    stable: false
   },
   {
     id: 'royalroad',
@@ -46,6 +64,7 @@ export const NOVEL_SOURCES: SourceConfig[] = [
     chaptersEndpoint: '/fiction/{id}/chapters',
     isContentPermitted: true,
     headers: { 'Accept': 'application/json' },
+    stable: false
   },
   {
     id: 'scribblehub',
@@ -55,6 +74,7 @@ export const NOVEL_SOURCES: SourceConfig[] = [
     detailsEndpoint: '/novel/{id}/',
     isContentPermitted: false,
     headers: { 'Accept': 'text/html,application/xhtml+xml' },
+    stable: false
   },
   {
     id: 'wuxiaworld',
@@ -64,6 +84,7 @@ export const NOVEL_SOURCES: SourceConfig[] = [
     detailsEndpoint: '/novel/{id}',
     isContentPermitted: false,
     headers: { 'Accept': 'application/json' },
+    stable: false
   },
   {
     id: 'boxnovel',
@@ -74,6 +95,7 @@ export const NOVEL_SOURCES: SourceConfig[] = [
     chaptersEndpoint: '/novel/{id}/chapter-{chapter}/',
     isContentPermitted: true,
     headers: { 'Accept': 'text/html,application/xhtml+xml' },
+    stable: false
   },
   {
     id: 'lightnovelworld',
@@ -83,6 +105,7 @@ export const NOVEL_SOURCES: SourceConfig[] = [
     detailsEndpoint: '/novel/{id}',
     isContentPermitted: false,
     headers: { 'Accept': 'text/html,application/xhtml+xml' },
+    stable: false
   },
   {
     id: 'novelfull',
@@ -92,6 +115,7 @@ export const NOVEL_SOURCES: SourceConfig[] = [
     detailsEndpoint: '/{id}.html',
     isContentPermitted: false,
     headers: { 'Accept': 'text/html,application/xhtml+xml' },
+    stable: false
   },
   {
     id: 'webnovel',
@@ -101,6 +125,7 @@ export const NOVEL_SOURCES: SourceConfig[] = [
     detailsEndpoint: '/book/{id}',
     isContentPermitted: false,
     headers: { 'Accept': 'application/json' },
+    stable: false
   },
 ];
 
