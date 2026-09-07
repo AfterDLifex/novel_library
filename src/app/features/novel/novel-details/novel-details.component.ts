@@ -10,6 +10,7 @@ import { CoverImageComponent } from '../../../shared/components/cover-image/cove
 import { IconComponent } from '../../../shared/components/icon/icon.component';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import { ChapterListComponent } from '../chapter-list/chapter-list.component';
+import { LibraryStore } from '../../library/library.store';
 
 @Component({
   selector: 'app-novel-details',
@@ -25,10 +26,13 @@ export class NovelDetailsComponent {
   readonly details = signal<NovelDetails | null>(null);
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
+  readonly isFavorite = signal(false);
+  expandedDescription = false;
 
   private route = inject(ActivatedRoute);
   private coordinator = inject(SearchCoordinatorService);
   private db = inject(DatabaseService);
+  private libraryStore = inject(LibraryStore);
 
   readonly novelId = computed(() => this.route.snapshot.paramMap.get('id') ?? '');
 
@@ -46,8 +50,13 @@ export class NovelDetailsComponent {
       const details = await this.coordinator.getNovelDetails(this.novelId());
       if (details) {
         this.details.set(details);
+        // Check favorite status in library
+        const item = this.libraryStore.items().find(i => i.novelId === this.novelId());
+        if (item) {
+          this.isFavorite.set(item.favorite);
+        }
       } else {
-        this.error.set('Novel not found');
+        this.error.set('Novel details could not be found.');
       }
     } catch (e) {
       this.error.set(e instanceof Error ? e.message : String(e));
@@ -60,9 +69,19 @@ export class NovelDetailsComponent {
     const d = this.details();
     if (!d) return;
     await this.db.addToLibrary(d as any);
+    await this.libraryStore.load();
   }
 
-    startReading() {
+  async toggleFavorite() {
+    const d = this.details();
+    if (!d) return;
+    const nextFav = !this.isFavorite();
+    this.isFavorite.set(nextFav);
+    await this.db.toggleFavorite(this.novelId());
+    await this.libraryStore.load();
+  }
+
+  startReading() {
     const d = this.details();
     if (!d || !d.chapters?.length) return;
     const firstChapter = d.chapters[0];

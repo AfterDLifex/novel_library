@@ -1,71 +1,157 @@
-﻿<div class="reader" [style.--reader-theme]="theme()" [ngStyle]="readerStyle">
+<div class="reader-container" [style.--reader-theme]="theme()" [ngStyle]="readerStyle">
   @if (loading()) {
-    <div class="loading"><app-loading-spinner /></div>
+    <div class="loading-state">
+      <app-loading-spinner />
+      <p>Loading chapter content...</p>
+    </div>
   } @else if (error()) {
-    <div class="error">{{ error() }}</div>
+    <div class="error-state">
+      <p>{{ error() }}</p>
+      <button class="primary-btn glass lift" (click)="loadChapters()">Retry Loading</button>
+    </div>
   } @else if (currentChapter()) {
-    <header class="reader-header" [class.hidden]="!showControls()">
-      <button class="back-btn" (click)="router.navigate(['/novel', novelIdVal])">
-        <app-icon name="back" [size]="20" />
+    <!-- Glass Header Controls -->
+    <header class="reader-header glass-strong" [class.hidden]="!showControls()">
+      <button class="icon-btn glass lift" (click)="goBack()" title="Back to Novel Details">
+        <app-icon name="arrowBack" [size]="20" />
       </button>
-      <h2>{{ currentChapter()?.title }}</h2>
-      <button class="settings-btn" (click)="toggleBottomSheet()">
-        <app-icon name="settings" [size]="20" />
-      </button>
+
+      <div class="header-info">
+        <h2 [title]="currentChapter()?.title">{{ currentChapter()?.title }}</h2>
+        <span class="chapter-number">Chapter {{ currentChapter()?.number }}</span>
+      </div>
+
+      <div class="header-right">
+        <button class="icon-btn glass lift" (click)="addBookmark()" title="Bookmark Chapter">
+          <app-icon name="bookmarkAdd" [size]="20" />
+        </button>
+        <button class="icon-btn glass lift" (click)="toggleChapterDrawer()" title="Chapter Directory">
+          <app-icon name="bookOpen" [size]="20" />
+        </button>
+        <button class="icon-btn glass lift" (click)="toggleBottomSheet()" title="Reader Appearance Settings">
+          <app-icon name="settings" [size]="20" />
+        </button>
+      </div>
     </header>
 
-    <div class="content-wrapper">
+    <!-- Reading Progress Bar Top -->
+    <div class="reading-progress-track">
+      <div class="reading-progress-fill" [style.width.%]="progressPercent()"></div>
+    </div>
+
+    <!-- Chapter Content Area -->
+    <main class="content-wrapper" (click)="toggleControls()">
       <div class="content" #contentEl (scroll)="onScroll()">
-        <div class="chapter-content">
-          @if (currentChapter()?.content) {
-            <p [innerHTML]="currentChapter()?.content || 'Content not available.'"></p>
-          } @else {
-            <p class="no-content">Chapter content is not available. This source may not permit content display.</p>
-          }
+        <article class="chapter-article">
+          <h1 class="chapter-heading">{{ currentChapter()?.title }}</h1>
+          
+          <div class="chapter-body">
+            @if (currentChapter()?.content) {
+              <p [innerHTML]="currentChapter()?.content"></p>
+            } @else {
+              <div class="no-content-notice glass">
+                <app-icon name="error" [size]="32" />
+                <p>Chapter content could not be rendered directly. Please ensure internet access or try refreshing.</p>
+              </div>
+            }
+          </div>
+
+          <!-- Bottom Nav inside reading flow -->
+          <div class="chapter-end-nav">
+            <button class="nav-btn glass lift" (click)="prevChapter()" [disabled]="isFirstChapter()">
+              <app-icon name="arrowBack" [size]="18" /> Previous Chapter
+            </button>
+
+            <button class="nav-btn primary-btn glass lift" (click)="nextChapter()" [disabled]="isLastChapter()">
+              Next Chapter <app-icon name="arrowForward" [size]="18" />
+            </button>
+          </div>
+        </article>
+      </div>
+    </main>
+
+    <!-- Floating Glass Footer Controls -->
+    <footer class="reader-footer glass-strong" [class.hidden]="!showControls()">
+      <button class="nav-btn glass lift" (click)="prevChapter()" [disabled]="isFirstChapter()">
+        <app-icon name="arrowBack" [size]="18" /> Prev
+      </button>
+
+      <div class="progress-indicator">
+        <span>Ch. {{ currentChapter()?.number }}</span>
+        <span class="percent-badge">{{ progressPercent() }}%</span>
+      </div>
+
+      <button class="nav-btn glass lift" (click)="nextChapter()" [disabled]="isLastChapter()">
+        Next <app-icon name="arrowForward" [size]="18" />
+      </button>
+    </footer>
+
+    <!-- Reader Settings Drawer Sheet -->
+    <div class="bottom-sheet glass-strong" [class.open]="isBottomSheetOpen()">
+      <div class="sheet-header">
+        <h3>Reader Preferences</h3>
+        <button class="close-btn" (click)="toggleBottomSheet()">
+          <app-icon name="close" [size]="18" />
+        </button>
+      </div>
+      
+      <div class="sheet-content">
+        <!-- Font Size adjustment -->
+        <div class="setting-group">
+          <label>Font Size: <strong>{{ fontSize() }}px</strong></label>
+          <div class="font-controls">
+            <button class="chip-btn" (click)="changeFontSize(-2)">
+              <app-icon name="fontDecrease" [size]="18" /> A-
+            </button>
+            <input type="range" min="12" max="32" [value]="fontSize()" (input)="readerSettings.updateFontSize($any($event.target).valueAsNumber)" class="slider" />
+            <button class="chip-btn" (click)="changeFontSize(2)">
+              <app-icon name="fontIncrease" [size]="18" /> A+
+            </button>
+          </div>
+        </div>
+
+        <!-- Typography selection -->
+        <div class="setting-group">
+          <label>Typography</label>
+          <div class="segmented-control">
+            <button (click)="setFontFamily('sans')" [class.active]="readerSettings.fontFamily() === 'var(--font-sans)'">Sans</button>
+            <button (click)="setFontFamily('serif')" [class.active]="readerSettings.fontFamily() === 'var(--font-serif)'">Serif</button>
+            <button (click)="setFontFamily('mono')" [class.active]="readerSettings.fontFamily() === 'var(--font-mono)'">Mono</button>
+          </div>
+        </div>
+
+        <!-- Reading Theme Selector -->
+        <div class="setting-group">
+          <label>Background Theme</label>
+          <div class="theme-chips">
+            <button (click)="readerSettings.setTheme('light')" [class.active]="theme() === 'light'" class="theme-chip light">Light</button>
+            <button (click)="readerSettings.setTheme('sepia')" [class.active]="theme() === 'sepia'" class="theme-chip sepia">Sepia</button>
+            <button (click)="readerSettings.setTheme('dark')" [class.active]="theme() === 'dark'" class="theme-chip dark">Dark</button>
+          </div>
         </div>
       </div>
     </div>
 
-    <footer class="reader-footer" [class.hidden]="!showControls()">
-      <div class="progress-bar">
-        <div class="progress-fill" [style.width.%]="progressPercent()"></div>
-      </div>
-
-      <div class="nav-bar">
-        <button class="nav-btn" (click)="prevChapter()">
-          <app-icon name="arrowBack" [size]="20" />
-        </button>
-        <span class="chapter-title">{{ currentChapter()?.title }}</span>
-        <button class="nav-btn" (click)="nextChapter()">
-          <app-icon name="arrowForward" [size]="20" />
+    <!-- Chapter List Drawer -->
+    <div class="chapter-drawer glass-strong" [class.open]="isChapterDrawerOpen()">
+      <div class="sheet-header">
+        <h3>Chapter Directory ({{ chapters().length }})</h3>
+        <button class="close-btn" (click)="toggleChapterDrawer()">
+          <app-icon name="close" [size]="18" />
         </button>
       </div>
-    </footer>
 
-    <div class="bottom-sheet" [class.open]="isBottomSheetOpen()">
-      <div class="sheet-handle" (click)="toggleBottomSheet()"></div>
-      <div class="sheet-content">
-        <h3>Reader Settings</h3>
-        <div class="setting-group">
-          <label>Font Size</label>
-          <div class="slider-group">
-            <button (click)="changeFontSize(-2)">A<span class="small">A</span></button>
-            <input type="range" min="12" max="32" [value]="fontSize()" (input)="readerSettings.updateFontSize($any($event.target).valueAsNumber)" />
-            <button (click)="changeFontSize(2)"><span class="large">A</span>A</button>
-          </div>
-        </div>
-        <div class="setting-group">
-          <label>Theme</label>
-          <div class="theme-options">
-            <button (click)="readerSettings.setTheme('light')" [class.active]="theme() === 'light'">Light</button>
-            <button (click)="readerSettings.setTheme('dark')" [class.active]="theme() === 'dark'">Dark</button>
-            <button (click)="readerSettings.setTheme('sepia')" [class.active]="theme() === 'sepia'">Sepia</button>
-          </div>
-        </div>
-        <div class="setting-group">
-          <label>Line Height</label>
-          <input type="range" min="1" max="3" step="0.1" [value]="readerSettings.lineHeight()" (input)="readerSettings.setLineHeight($any($event.target).valueAsNumber)" />
-        </div>
+      <div class="chapter-drawer-list">
+        <button
+          *ngFor="let ch of chapters()"
+          class="drawer-chapter-item"
+          [class.active]="ch.id === currentChapter()?.id"
+          (click)="selectChapterFromDrawer(ch)"
+        >
+          <span class="ch-num">Ch. {{ ch.number }}</span>
+          <span class="ch-title">{{ ch.title }}</span>
+        </button>
       </div>
     </div>
   }
+</div>

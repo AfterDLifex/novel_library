@@ -1,45 +1,92 @@
-@if (loading()) {
-  <div class="loading"><app-loading-spinner /></div>
-} @else if (error()) {
-  <app-error-message [message]="error()" />
-  <button class="retry-btn" (click)="load()">Retry</button>
-} @else if (details()) {
-  <div class="novel-detail">
-    <div class="header">
-      <app-cover-image [src]="details()?.coverUrl" [alt]="details()?.title ?? ''" [aspectRatio]="'2/3'" />
-      <div class="info">
-        <h1>{{ details()?.title }}</h1>
-        @if (details()?.author) {
-          <p class="author">{{ details()?.author }}</p>
-        }
-        <app-status-badge [status]="details()?.status ?? 'unknown'" />
-        <div class="genres" *ngIf="details()?.genres?.length">
-          <span class="genre" *ngFor="let g of details()?.genres">{{ g }}</span>
+<div class="novel-details-page content-shell">
+  @if (loading()) {
+    <div class="loading-state">
+      <app-loading-spinner />
+      <p>Loading novel details...</p>
+    </div>
+  } @else if (error()) {
+    <div class="error-container">
+      <app-error-message [message]="error()!" />
+      <button class="primary-btn glass lift" (click)="load()">Retry Loading</button>
+    </div>
+  } @else if (details()) {
+    <!-- Hero Glass Header Banner -->
+    <div class="hero-banner glass-strong lift">
+      <div class="hero-backdrop" [style.background-image]="'url(' + (details()?.coverUrl || '') + ')'"></div>
+      <div class="hero-overlay"></div>
+
+      <div class="hero-content">
+        <div class="cover-box">
+          <app-cover-image [src]="details()?.coverUrl" [alt]="details()?.title ?? ''" [aspectRatio]="'2/3'" />
         </div>
-        <p class="chapters-count">{{ details()?.totalChapters ?? details()?.chapters?.length ?? 0 }} chapters</p>
-        <div class="actions">
-          <button class="primary-btn" (click)="addToLibrary()">Add to Library</button>
-          <button class="secondary-btn" (click)="startReading()">
-            <app-icon name="arrowForward" [size]="18" /> Start Reading
-          </button>
+
+        <div class="meta-info">
+          <div class="badges-row">
+            <app-status-badge [status]="details()?.status ?? 'unknown'" />
+            <span class="chapters-count-badge badge badge-secondary">
+              <app-icon name="bookOpen" [size]="14" />
+              {{ details()?.totalChapters ?? details()?.chapters?.length ?? 0 }} Chapters
+            </span>
+          </div>
+
+          <h1 class="title">{{ details()?.title }}</h1>
+          
+          @if (details()?.author) {
+            <p class="author">By <span>{{ details()?.author }}</span></p>
+          }
+
+          @if (details()?.genres?.length) {
+            <div class="genres-list">
+              <span class="genre-tag" *ngFor="let g of details()?.genres">{{ g }}</span>
+            </div>
+          }
+
+          <div class="action-buttons">
+            <button class="btn-primary glass-btn lift" (click)="startReading()">
+              <app-icon name="arrowForward" [size]="18" /> Continue / Read Now
+            </button>
+
+            <button class="btn-secondary glass-btn lift" (click)="addToLibrary()">
+              <app-icon name="add" [size]="18" /> Save to Library
+            </button>
+
+            <button class="btn-icon glass-btn lift" (click)="toggleFavorite()" [title]="isFavorite() ? 'Remove Favorite' : 'Mark Favorite'">
+              <app-icon [name]="isFavorite() ? 'star' : 'starBorder'" [size]="20" [class.fav]="isFavorite()" />
+            </button>
+          </div>
         </div>
       </div>
     </div>
 
+    <!-- Description Panel -->
     @if (details()?.description) {
-      <section class="description">
-        <h2>Description</h2>
-        <p>{{ details()?.description }}</p>
+      <section class="description-section glass-strong">
+        <h2 class="section-title">
+          <app-icon name="book" [size]="20" /> Synopsis
+        </h2>
+        <p class="description-text" [class.expanded]="expandedDescription">
+          {{ details()?.description }}
+        </p>
+        <button class="expand-btn" (click)="expandedDescription = !expandedDescription">
+          {{ expandedDescription ? 'Show Less' : 'Read Full Synopsis' }}
+          <app-icon [name]="expandedDescription ? 'chevronUp' : 'chevronDown'" [size]="16" />
+        </button>
       </section>
     }
 
-    <section class="chapters">
-      <h2>Chapters</h2>
+    <!-- Chapter List Section -->
+    <section class="chapters-section glass-strong">
+      <div class="chapters-header">
+        <h2 class="section-title">
+          <app-icon name="bookOpen" [size]="20" /> Chapters Directory
+        </h2>
+      </div>
+
       <app-chapter-list
         [chapterCount]="details()?.totalChapters ?? 0"
         [novelId]="novelId()"
         (chapterSelected)="openReader($event)"
       />
     </section>
-  </div>
-}
+  }
+</div>

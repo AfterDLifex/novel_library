@@ -8,7 +8,7 @@ import { ReaderSettings } from './models';
  */
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
-  private readonly _themeClass = signal<'light' | 'dark' | 'sepia'>('light');
+  private readonly _themeClass = signal<ReaderSettings['theme']>('light');
   readonly themeClass = this._themeClass.asReadonly();
 
   constructor(private settings: SettingsService) {
@@ -22,7 +22,7 @@ export class ThemeService {
 
   private applyTheme(theme: ReaderSettings['theme']) {
     this._themeClass.set(theme);
-    document.body.classList.remove('theme-light', 'theme-dark', 'theme-sepia');
+    document.body.classList.remove('theme-light', 'theme-dark', 'theme-sepia', 'theme-midnight');
     document.body.classList.add(`theme-${theme}`);
   }
 
@@ -32,7 +32,7 @@ export class ThemeService {
 
   async toggleTheme() {
     const current = this.settings.settings().reader.theme;
-    const next: ReaderSettings['theme'] = current === 'dark' ? 'light' : 'dark';
+    const next: ReaderSettings['theme'] = current === 'dark' ? 'light' : current === 'light' ? 'sepia' : current === 'sepia' ? 'midnight' : 'dark';
     await this.setTheme(next);
   }
 }

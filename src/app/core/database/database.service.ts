@@ -84,6 +84,14 @@ export class DatabaseService {
     await db.library.where({ novelId }).modify({ ...changes, updatedAt: Date.now() });
   }
 
+  async toggleFavorite(novelId: string): Promise<boolean> {
+    const item = await this.getLibraryItem(novelId);
+    if (!item) return false;
+    const next = !item.favorite;
+    await this.updateLibraryItem(novelId, { favorite: next });
+    return next;
+  }
+
   async removeFromLibrary(novelId: string): Promise<void> {
     await db.transaction('rw', [
       db.library, db.progress, db.bookmarks, db.history,

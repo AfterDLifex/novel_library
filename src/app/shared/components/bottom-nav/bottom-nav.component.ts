@@ -1,8 +1,7 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { IconComponent } from '../icon/icon.component';
-import { IconName } from '../icon/icon.component';
+import { IconComponent, IconName } from '../icon/icon.component';
 
 interface NavItem {
   label: string;
@@ -13,35 +12,44 @@ interface NavItem {
 @Component({
   selector: 'app-bottom-nav',
   template: `
-    <nav class="bottom-nav">
-      <a
-        *ngFor="let item of navItems"
-        [routerLink]="[item.path]"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
-        class="nav-item"
-      >
-        <app-icon [name]="item.icon" [size]="22" />
-        <span>{{ item.label }}</span>
-      </a>
+    <nav class="navigation-bar glass-strong">
+      <div class="nav-container">
+        <a
+          *ngFor="let item of navItems"
+          [routerLink]="[item.path]"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="nav-item"
+        >
+          <div class="icon-wrapper">
+            <app-icon [name]="item.icon" [size]="20" />
+          </div>
+          <span class="nav-label">{{ item.label }}</span>
+        </a>
+      </div>
     </nav>
   `,
   styles: [`
-    .bottom-nav {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      height: 60px;
+    .navigation-bar {
       position: sticky;
       bottom: 0;
       z-index: 100;
-      background: var(--glass-bg-strong);
-      backdrop-filter: blur(var(--glass-blur-strong)) saturate(1.5);
-      -webkit-backdrop-filter: blur(var(--glass-blur-strong)) saturate(1.5);
+      width: 100%;
       border-top: 1px solid var(--glass-border);
-      box-shadow: 0 1px 0 var(--glass-border), 0 -12px 24px rgba(0, 0, 0, 0.08);
-      padding: env(safe-area-inset-bottom, 0);
+      padding-bottom: env(safe-area-inset-bottom, 0);
+      transition: background 0.3s ease;
     }
+
+    .nav-container {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      max-width: var(--content-max, 1200px);
+      margin: 0 auto;
+      height: 62px;
+      padding: 0 0.5rem;
+    }
+
     .nav-item {
       position: relative;
       display: flex;
@@ -50,35 +58,60 @@ interface NavItem {
       justify-content: center;
       gap: 3px;
       flex: 1;
-      height: 60px;
+      height: 100%;
       color: var(--md-sys-color-on-surface-variant);
       text-decoration: none;
       font-size: 0.7rem;
-      transition: color 0.2s ease;
+      font-weight: 500;
+      transition: color 0.22s var(--ease-out);
     }
-    .nav-item::before {
-      content: '';
-      position: absolute;
-      top: 5px;
-      left: 50%;
-      width: 36px;
-      height: 27px;
+
+    .icon-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 28px;
       border-radius: 14px;
-      background: color-mix(in srgb, var(--md-sys-color-primary) 16%, transparent);
-      transform: translateX(-50%) scale(0.5);
-      opacity: 0;
-      transition: transform 0.22s var(--ease-out), opacity 0.22s ease;
+      transition: transform 0.25s var(--ease-out), background 0.25s ease;
     }
-    .nav-item:hover { color: var(--md-sys-color-primary); }
-    .nav-item.active { color: var(--md-sys-color-primary); }
-    .nav-item.active::before {
-      opacity: 1;
-      transform: translateX(-50%) scale(1);
+
+    .nav-item:hover .icon-wrapper {
+      background: color-mix(in srgb, var(--md-sys-color-primary) 12%, transparent);
+      color: var(--md-sys-color-primary);
+      transform: translateY(-1px);
     }
-    .nav-item.active app-icon { color: var(--md-sys-color-primary); }
-    @media (max-width: 360px) {
-      .bottom-nav { height: 56px; }
-      .nav-item { height: 56px; font-size: 0.64rem; }
+
+    .nav-item.active {
+      color: var(--md-sys-color-primary);
+      font-weight: 650;
+    }
+
+    .nav-item.active .icon-wrapper {
+      background: color-mix(in srgb, var(--md-sys-color-primary) 22%, transparent);
+      color: var(--md-sys-color-primary);
+    }
+
+    .nav-label {
+      white-space: nowrap;
+      letter-spacing: -0.01em;
+    }
+
+    @media (min-width: 768px) {
+      .nav-container {
+        justify-content: center;
+        gap: 1.5rem;
+      }
+      .nav-item {
+        flex: initial;
+        flex-direction: row;
+        gap: 0.5rem;
+        padding: 0 1.25rem;
+        border-radius: 1.5rem;
+        height: 42px;
+      }
+      .nav-label { font-size: 0.85rem; }
     }
   `],
   standalone: true,
@@ -90,6 +123,9 @@ export class BottomNavComponent {
     { label: 'Home', icon: 'home', path: 'home' },
     { label: 'Search', icon: 'search', path: 'search' },
     { label: 'Library', icon: 'library', path: 'library' },
+    { label: 'Bookmarks', icon: 'bookmarks', path: 'bookmarks' },
+    { label: 'History', icon: 'history', path: 'history' },
+    { label: 'Collections', icon: 'collections', path: 'collections' },
     { label: 'Settings', icon: 'settings', path: 'settings' },
   ];
 }

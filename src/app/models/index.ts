@@ -85,7 +85,7 @@ export interface ReaderSettings {
   fontSize: number;
   lineHeight: number;
   fontFamily: string;
-  theme: 'light' | 'dark' | 'sepia';
+  theme: 'light' | 'dark' | 'sepia' | 'midnight';
   contentWidth: number;
   keepScreenAwake: boolean;
 }
