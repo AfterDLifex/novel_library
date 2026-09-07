@@ -100,6 +100,31 @@ import { ReaderSettings } from '../../models';
       </section>
 
       <section class="settings-section">
+        <h2>Novel Search Proxy</h2>
+        <div class="setting-group">
+          <label>
+            <input type="checkbox" [checked]="backendProxyEnabled()" (change)="toggleBackendProxy($event)" />
+            Search novel websites via local proxy server
+          </label>
+          <p class="hint">
+            Novel sites block direct browser requests. Run the bundled proxy
+            (<code>cd server && npm install && npm start</code>, port 5000) and enable
+            this to search Royal Road, Syosetu and more directly.
+          </p>
+        </div>
+
+        @if (backendProxyEnabled()) {
+          <div class="setting-group">
+            <label>Proxy server URL</label>
+            <input type="text" placeholder="http://localhost:5000"
+              [(ngModel)]="backendUrlInput"
+              (blur)="saveBackendUrl()" />
+            <p class="hint">{{ backendStatus() }}</p>
+          </div>
+        }
+      </section>
+
+      <section class="settings-section">
         <h2>Data Management</h2>
         <div class="setting-group">
           <button class="action-btn" (click)="exportData()">
@@ -149,8 +174,11 @@ export class SettingsPageComponent {
   readonly reader = computed(() => this.settings.settings().reader);
   readonly syncEnabled = computed(() => this.settings.settings().syncEnabled);
   readonly lastSync = computed(() => this.settings.settings().lastSyncAt);
+  readonly backendProxyEnabled = computed(() => !!this.settings.settings().backendProxyEnabled);
 
   clientIdInput = '';
+  backendUrlInput = 'http://localhost:5000';
+  backendStatus = signal('Checking proxy server…');
 
   readonly authenticated;
   readonly user;
@@ -164,10 +192,49 @@ export class SettingsPageComponent {
   ) {
     this.clientIdInput =
       this.settings.settings().googleClientId ?? '';
+    this.backendUrlInput =
+      this.settings.settings().backendProxyUrl ?? 'http://localhost:5000';
 
     this.authenticated = this.auth.authenticated;
     this.user = this.auth.user;
     this.syncing = this.syncEngine.syncing;
+
+    if (this.backendProxyEnabled()) {
+      this.checkBackendHealth();
+    }
+  }
+
+  async toggleBackendProxy(event: Event) {
+    const enabled = (event.target as HTMLInputElement).checked;
+    await this.settings.update({ backendProxyEnabled: enabled });
+    if (enabled) {
+      await this.settings.update({
+        backendProxyUrl: this.backendUrlInput || 'http://localhost:5000',
+      });
+      this.checkBackendHealth();
+    }
+  }
+
+  async saveBackendUrl() {
+    await this.settings.update({ backendProxyUrl: this.backendUrlInput });
+    this.checkBackendHealth();
+  }
+
+  private async checkBackendHealth() {
+    const url = (this.backendUrlInput || 'http://localhost:5000').replace(/\/$/, '');
+    try {
+      const res = await fetch(`${url}/api/health`);
+      if (res.ok) {
+        const data = await res.json();
+        this.backendStatus.set(`Connected — ${data.sources} sources available.`);
+      } else {
+        this.backendStatus.set(`Proxy responded with HTTP ${res.status}.`);
+      }
+    } catch {
+      this.backendStatus.set(
+        'Could not reach the proxy server. Is it running? (cd server && npm start)'
+      );
+    }
   }
 
   async setTheme(theme: ReaderSettings['theme']) {

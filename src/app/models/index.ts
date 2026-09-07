@@ -97,6 +97,10 @@ export interface AppSettings {
   schemaVersion?: number;
   deviceId: string;
   googleClientId?: string;
+  /** Route online novel searches through the local backend proxy server. */
+  backendProxyEnabled?: boolean;
+  /** Base URL of the backend proxy server (default http://localhost:5000). */
+  backendProxyUrl?: string;
 }
 
 export interface SyncOperation {

@@ -12,6 +12,11 @@ import { HttpSourceAdapter } from '../adapters/http-source.adapter';
 import { JsonApiAdapter } from '../adapters/json-api.adapter';
 import { NOVEL_SOURCES } from '../adapters/source-registry';
 import { GutendexAdapter } from '../adapters/gutendex.adapter';
+import { BackendSearchAdapter } from '../adapters/backend-search.adapter';
+import { SettingsService } from '../../../core/storage/settings.service';
+import { effect } from '@angular/core';
+
+const DEFAULT_BACKEND_URL = 'http://localhost:5000';
 
 /**
  * Search coordinator that manages multiple source adapters.
@@ -34,22 +39,73 @@ export class SearchCoordinatorService {
   private readonly _activeSourceIds = signal<Set<string>>(new Set());
   readonly activeSourceIds = this._activeSourceIds.asReadonly();
 
-  constructor(private cache: LocalCacheService) {
-    // Register mock adapter for testing
-    // this.registerSource(new MockSearchAdapter());
-    
-    // Register the Gutendex adapter (this provides real data!)
+  constructor(
+    private cache: LocalCacheService,
+    private settings: SettingsService
+  ) {
+    // Register the Gutendex adapter (works directly from the browser)
     this.registerSource(new GutendexAdapter());
-    
-    // Register other online sources from config
+
+    // Register online sources: via backend proxy if enabled, direct otherwise.
     this.registerOnlineSources();
+
+    // Re-sync adapters whenever the backend proxy setting changes.
+    effect(() => {
+      this.applyBackendProxySetting();
+    });
   }
 
   private registerOnlineSources(): void {
     for (const config of NOVEL_SOURCES) {
+      // Skip sources registered by the backend proxy sync below.
+      if (this.settings.settings().backendProxyEnabled) break;
       this.registerFromConfig(config);
     }
+    this.applyBackendProxySetting();
   }
+
+  /**
+   * Swap direct (browser) adapters for backend-proxied adapters when the
+   * backend proxy is enabled in settings, and back when disabled.
+   */
+  private applyBackendProxySetting(): void {
+    const s = this.settings.settings();
+    const enabled = !!s.backendProxyEnabled;
+    const backendUrl = (s.backendProxyUrl || DEFAULT_BACKEND_URL).replace(/\/$/, '');
+
+    const backendIds = ['royalroad', 'syosetu', 'novelfull', 'lightnovelworld', 'novelupdates'];
+
+    if (enabled) {
+      // Remove direct adapters for proxied sources, add backend adapters.
+      for (const id of backendIds) {
+        const existing = this._sources().find((a) => a.id === id);
+        if (existing && !(existing instanceof BackendSearchAdapter)) {
+          this.unregisterSource(id);
+        }
+      }
+      for (const id of backendIds) {
+        if (!this._sources().some((a) => a.id === id)) {
+          const name = NOVEL_SOURCES.find((c) => c.id === id)?.name ?? id;
+          this.registerSource(new BackendSearchAdapter(id, name, backendUrl));
+        }
+      }
+    } else {
+      // Remove backend adapters, restore direct adapters for configured sources.
+      for (const id of backendIds) {
+        const existing = this._sources().find((a) => a.id === id);
+        if (existing instanceof BackendSearchAdapter) {
+          this.unregisterSource(id);
+        }
+      }
+      for (const config of NOVEL_SOURCES) {
+        if (config.id === 'gutendex') continue;
+        if (!this._sources().some((a) => a.id === config.id)) {
+          this.registerFromConfig(config);
+        }
+      }
+    }
+  }
+
 
   registerSource(adapter: NovelSourceAdapter): void {
     this._sources.update((s) => [...s, adapter]);
