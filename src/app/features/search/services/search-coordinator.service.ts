@@ -9,6 +9,7 @@ import { normalizeTitle } from '../../../core/utils/normalize.util';
 import { generateNovelId } from '../../../core/utils/id.util';
 import { NovelSourceAdapter, SourceConfig } from '../adapters/source.interface';
 import { HttpSourceAdapter } from '../adapters/http-source.adapter';
+import { NOVEL_SOURCES } from '../adapters/source-registry';
 
 /**
  * Search coordinator that manages multiple source adapters.
@@ -28,20 +29,55 @@ export class SearchCoordinatorService {
   private readonly _sources = signal<NovelSourceAdapter[]>([]);
   readonly sources = this._sources.asReadonly();
 
+  private readonly _activeSourceIds = signal<Set<string>>(new Set());
+  readonly activeSourceIds = this._activeSourceIds.asReadonly();
+
   constructor(private cache: LocalCacheService) {
     this.registerSource(new MockSearchAdapter());
+    this.registerOnlineSources();
+  }
+
+  private registerOnlineSources(): void {
+    for (const config of NOVEL_SOURCES) {
+      this.registerFromConfig(config);
+    }
   }
 
   registerSource(adapter: NovelSourceAdapter): void {
     this._sources.update((s) => [...s, adapter]);
+    this._activeSourceIds.update((set) => new Set(set).add(adapter.id));
   }
 
   registerFromConfig(config: SourceConfig): void {
-    this._sources.update((s) => [...s, new HttpSourceAdapter(config)]);
+    const adapter = new HttpSourceAdapter(config);
+    this.registerSource(adapter);
   }
 
   unregisterSource(sourceId: string): void {
     this._sources.update((s) => s.filter((a) => a.id !== sourceId));
+    this._activeSourceIds.update((set) => {
+      const next = new Set(set);
+      next.delete(sourceId);
+      return next;
+    });
+  }
+
+  toggleSource(sourceId: string): void {
+    const current = this._activeSourceIds();
+    if (current.has(sourceId)) {
+      this._activeSourceIds.update((set) => {
+        const next = new Set(set);
+        next.delete(sourceId);
+        return next;
+      });
+    } else {
+      this._activeSourceIds.update((set) => new Set(set).add(sourceId));
+    }
+  }
+
+  getSourceName(sourceId: string): string {
+    const source = this._sources().find((s) => s.id === sourceId);
+    return source?.name ?? sourceId;
   }
 
   async search(query: string): Promise<void> {
@@ -53,7 +89,7 @@ export class SearchCoordinatorService {
     this._loading.set(true);
     this._errors.set(new Map());
 
-    const sources = this._sources();
+    const sources = this._sources().filter((s) => this._activeSourceIds().has(s.id));
     const searchPromises = sources.map(async (source) => {
       const cacheKey = LocalCacheService.searchKey(source.id, query);
       const cached = await this.cache.get<NovelSearchResult[]>(cacheKey);

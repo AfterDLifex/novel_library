@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { NovelSearchResult } from '../../../../models';
 import { CoverImageComponent } from '../../../../shared/components/cover-image/cover-image.component';
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
+import { SourceBadgeComponent } from '../source-badge/source-badge.component';
 
 @Component({
   selector: 'app-search-result-card',
@@ -12,7 +13,10 @@ import { IconComponent } from '../../../../shared/components/icon/icon.component
       <a [routerLink]="['/novel', novelId]" class="card-link">
         <app-cover-image [src]="result.coverUrl" [alt]="result.title" [aspectRatio]="'3/4'" />
         <div class="result-info">
-          <h3>{{ result.title }}</h3>
+          <div class="title-row">
+            <h3>{{ result.title }}</h3>
+            <app-source-badge [sourceId]="result.sourceId" [sourceName]="sourceName" />
+          </div>
           @if (result.author) {
             <p class="author">{{ result.author }}</p>
           }
@@ -55,7 +59,21 @@ import { IconComponent } from '../../../../shared/components/icon/icon.component
     }
     app-cover-image { width: 48px; min-width: 48px; }
     .result-info { flex: 1; min-width: 0; }
-    h3 { font-size: 0.95rem; font-weight: 600; margin: 0 0 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+      min-width: 0;
+    }
     .author { font-size: 0.8rem; color: var(--md-sys-color-on-surface-variant); margin: 0 0 0.25rem; }
     .description { font-size: 0.75rem; color: var(--md-sys-color-on-surface-variant); margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .add-btn {
@@ -76,12 +94,13 @@ import { IconComponent } from '../../../../shared/components/icon/icon.component
     .add-btn:disabled { cursor: default; opacity: 0.6; }
   `],
   standalone: true,
-  imports: [CommonModule, RouterLink, CoverImageComponent, IconComponent],
+  imports: [CommonModule, RouterLink, CoverImageComponent, IconComponent, SourceBadgeComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SearchResultCardComponent {
   @Input() result!: NovelSearchResult;
   @Input() inLibrary = false;
+  @Input() sourceName = '';
   @Output() addToLibrary = new EventEmitter<NovelSearchResult>();
 
   get novelId(): string {

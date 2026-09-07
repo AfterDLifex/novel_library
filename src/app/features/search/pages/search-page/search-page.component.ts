@@ -9,6 +9,7 @@ import { ErrorMessageComponent } from '../../../../shared/components/error-messa
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { SearchResultCardComponent } from '../../components/search-results/search-results.component';
+import { SourceIconComponent } from '../../components/source-icon/source-icon.component';
 import { DatabaseService } from '../../../../core/database/database.service';
 import { LibraryService } from '../../../library/library.service';
 import { NovelSearchResult } from '../../../../models';
@@ -21,10 +22,41 @@ import { NovelSearchResult } from '../../../../models';
         <div class="search-box">
           <app-icon name="search" [size]="20" />
           <input type="text" [(ngModel)]="query" (input)="onQueryChange()"
-            placeholder="Search novels..." autocomplete="off" />
+            placeholder="Search novels across {{ activeSourceCount() }} sources..." autocomplete="off" />
         </div>
         <button class="search-btn" (click)="doSearch()" [disabled]="loading()">Search</button>
       </header>
+
+      <div class="source-filters">
+        <button
+          class="filter-toggle"
+          (click)="showFilters.set(!showFilters())"
+          [class.active]="showFilters()"
+        >
+          <app-icon name="settings" [size]="16" />
+          <span>Sources</span>
+          <app-icon name="arrowForward" [size]="14" [class.rotated]="showFilters()" />
+        </button>
+        <span class="active-count">{{ activeSourceCount() }} active</span>
+      </div>
+
+      @if (showFilters()) {
+        <div class="source-list">
+          @for (source of sources(); track source.id) {
+            <button
+              class="source-chip"
+              [class.active]="isSourceActive(source.id)"
+              (click)="toggleSource(source.id)"
+            >
+              <app-source-icon [sourceId]="source.id" [sourceName]="source.name" [size]="14" />
+              <span class="chip-name">{{ source.name }}</span>
+              @if (isSourceActive(source.id)) {
+                <app-icon name="check" [size]="14" />
+              }
+            </button>
+          }
+        </div>
+      }
 
       @if (loading()) {
         <div class="loading"><app-loading-spinner /></div>
@@ -33,7 +65,7 @@ import { NovelSearchResult } from '../../../../models';
       @if (errors().size > 0 && !loading()) {
         <div class="source-errors">
           @for (entry of errorsArray(); track $index) {
-            <app-error-message [message]="'Source error: ' + entry[1]" />
+            <app-error-message [message]="getSourceErrorLabel(entry[0]) + ': ' + entry[1]" />
           }
         </div>
       }
@@ -42,6 +74,7 @@ import { NovelSearchResult } from '../../../../models';
         <app-search-result-card
           *ngFor="let result of results()"
           [result]="result"
+          [sourceName]="getSourceName(result.sourceId)"
           (addToLibrary)="onAddToLibrary($event)"
           [inLibrary]="inLibrary(result)"
         />
@@ -49,7 +82,7 @@ import { NovelSearchResult } from '../../../../models';
 
       @if (!loading() && results().length === 0 && query.trim()) {
         <app-empty-state icon="search" title="No results found"
-          message="Try a different search term." />
+          message="Try a different search term or enable more sources." />
       }
 
       @if (!loading() && !query.trim()) {
@@ -60,11 +93,22 @@ import { NovelSearchResult } from '../../../../models';
   `,
   styles: [`
     .search-page { padding: 1rem; }
-    .search-header { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .search-header { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
     .search-box { flex: 1; display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; background: var(--md-sys-color-surface); border: 1px solid var(--md-sys-color-outline-variant); border-radius: 0.5rem; }
     .search-box input { flex: 1; border: none; outline: none; background: transparent; color: var(--md-sys-color-on-surface); font-size: 0.9rem; }
     .search-btn { padding: 0.5rem 1rem; background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; }
     .search-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .source-filters { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
+    .filter-toggle { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.65rem; border: 1px solid var(--md-sys-color-outline-variant); border-radius: 0.5rem; background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface); font-size: 0.75rem; cursor: pointer; transition: all 0.2s; }
+    .filter-toggle:hover { border-color: var(--md-sys-color-primary); }
+    .filter-toggle.active { border-color: var(--md-sys-color-primary); color: var(--md-sys-color-primary); }
+    .filter-toggle .rotated { transform: rotate(90deg); }
+    .active-count { font-size: 0.7rem; color: var(--md-sys-color-on-surface-variant); }
+    .source-list { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; padding: 0.75rem; background: var(--md-sys-color-surface); border: 1px solid var(--md-sys-color-outline-variant); border-radius: 0.5rem; }
+    .source-chip { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.3rem 0.6rem; border: 1px solid var(--md-sys-color-outline-variant); border-radius: 1rem; background: transparent; color: var(--md-sys-color-on-surface); font-size: 0.7rem; cursor: pointer; transition: all 0.2s; }
+    .source-chip:hover { border-color: var(--md-sys-color-primary); }
+    .source-chip.active { background: color-mix(in srgb, var(--md-sys-color-primary) 12%, transparent); border-color: var(--md-sys-color-primary); color: var(--md-sys-color-primary); }
+    .chip-name { white-space: nowrap; }
     .loading { display: flex; justify-content: center; padding: 2rem; }
     .results { display: flex; flex-direction: column; gap: 0.5rem; }
     .source-errors { margin: 1rem 0; }
@@ -72,17 +116,21 @@ import { NovelSearchResult } from '../../../../models';
   standalone: true,
   imports: [
     CommonModule, FormsModule, LoadingSpinnerComponent, ErrorMessageComponent,
-    EmptyStateComponent, IconComponent, SearchResultCardComponent,
+    EmptyStateComponent, IconComponent, SearchResultCardComponent, SourceIconComponent,
   ],
 })
 export class SearchPageComponent {
   query = '';
+  showFilters = signal(false);
   private querySubject = new Subject<string>();
 
   readonly results = computed(() => this.coordinator.results());
   readonly loading = computed(() => this.coordinator.loading());
   readonly errors = computed(() => this.coordinator.errors());
   readonly errorsArray = computed(() => Array.from(this.coordinator.errors().entries()));
+  readonly sources = computed(() => this.coordinator.sources());
+  readonly activeSourceIds = computed(() => this.coordinator.activeSourceIds());
+  readonly activeSourceCount = computed(() => this.coordinator.activeSourceIds().size);
 
   private readonly libraryItems = signal<Set<string>>(new Set());
   private readonly database = inject(DatabaseService);
@@ -107,6 +155,22 @@ export class SearchPageComponent {
 
   doSearch() {
     this.coordinator.search(this.query);
+  }
+
+  isSourceActive(sourceId: string): boolean {
+    return this.activeSourceIds().has(sourceId);
+  }
+
+  toggleSource(sourceId: string): void {
+    this.coordinator.toggleSource(sourceId);
+  }
+
+  getSourceName(sourceId: string): string {
+    return this.coordinator.getSourceName(sourceId);
+  }
+
+  getSourceErrorLabel(sourceId: string): string {
+    return this.coordinator.getSourceName(sourceId);
   }
 
   inLibrary(result: NovelSearchResult): boolean {
