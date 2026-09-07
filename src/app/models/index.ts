@@ -107,8 +107,16 @@ export interface ReaderSettings {
   keepScreenAwake: boolean;
 }
 
+export interface NavigationSettings {
+  position: 'bottom' | 'top' | 'floating-bottom' | 'floating-top';
+  stickiness: 'sticky' | 'autohide' | 'static';
+  oneHandedMode: 'disabled' | 'right' | 'left';
+  maxVisibleMobileTabs: number;
+}
+
 export interface AppSettings {
   reader: ReaderSettings;
+  navigation?: NavigationSettings;
   syncEnabled: boolean;
   lastSyncAt?: number;
   schemaVersion?: number;

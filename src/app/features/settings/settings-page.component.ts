@@ -7,7 +7,7 @@ import { SettingsService } from '../../core/storage/settings.service';
 import { AuthStateService } from '../../core/auth/auth-state.service';
 import { SyncEngineService } from '../../core/sync/sync-engine.service';
 import { DatabaseService } from '../../core/database/database.service';
-import { ReaderSettings } from '../../models';
+import { ReaderSettings, NavigationSettings } from '../../models';
 
 @Component({
   selector: 'app-settings-page',
@@ -62,6 +62,69 @@ import { ReaderSettings } from '../../models';
               <input type="checkbox" [checked]="reader().keepScreenAwake" (change)="setKeepAwake($event)" />
               Keep screen awake while reading
             </label>
+          </div>
+        </section>
+
+        <!-- Navigation & One-Handed Reachability Settings -->
+        <section class="settings-section glass-strong">
+          <h2><app-icon name="gridView" [size]="20" /> Navigation Layout & One-Handed Ergonomics</h2>
+
+          <div class="setting-group">
+            <label>Navbar Position</label>
+            <div class="option-grid">
+              <button (click)="setNavPosition('floating-bottom')" [class.active]="navigation().position === 'floating-bottom'">
+                Floating Bottom Pill
+              </button>
+              <button (click)="setNavPosition('bottom')" [class.active]="navigation().position === 'bottom'">
+                Bottom Bar
+              </button>
+              <button (click)="setNavPosition('floating-top')" [class.active]="navigation().position === 'floating-top'">
+                Floating Top Pill
+              </button>
+              <button (click)="setNavPosition('top')" [class.active]="navigation().position === 'top'">
+                Top Sub-Bar
+              </button>
+            </div>
+          </div>
+
+          <div class="setting-group">
+            <label>Scroll Stickiness</label>
+            <div class="option-grid">
+              <button (click)="setNavStickiness('autohide')" [class.active]="navigation().stickiness === 'autohide'">
+                Auto-Hide on Scroll
+              </button>
+              <button (click)="setNavStickiness('sticky')" [class.active]="navigation().stickiness === 'sticky'">
+                Always Sticky
+              </button>
+              <button (click)="setNavStickiness('static')" [class.active]="navigation().stickiness === 'static'">
+                Static Flow
+              </button>
+            </div>
+          </div>
+
+          <div class="setting-group">
+            <label>One-Handed Ergonomics Mode</label>
+            <div class="option-grid">
+              <button (click)="setOneHandedMode('disabled')" [class.active]="navigation().oneHandedMode === 'disabled'">
+                Disabled (Centered)
+              </button>
+              <button (click)="setOneHandedMode('right')" [class.active]="navigation().oneHandedMode === 'right'">
+                Right-Handed Thumb
+              </button>
+              <button (click)="setOneHandedMode('left')" [class.active]="navigation().oneHandedMode === 'left'">
+                Left-Handed Thumb
+              </button>
+            </div>
+            <p class="hint">Shift navigation towards your preferred thumb & activate quick-thumb radial speed dial.</p>
+          </div>
+
+          <div class="setting-group">
+            <label>Mobile Visible Tabs Limit (Remaining go to "More" Drawer)</label>
+            <div class="option-grid">
+              <button (click)="setMaxMobileTabs(3)" [class.active]="navigation().maxVisibleMobileTabs === 3">3 Tabs</button>
+              <button (click)="setMaxMobileTabs(4)" [class.active]="navigation().maxVisibleMobileTabs === 4">4 Tabs</button>
+              <button (click)="setMaxMobileTabs(5)" [class.active]="navigation().maxVisibleMobileTabs === 5">5 Tabs</button>
+            </div>
           </div>
         </section>
 
@@ -188,12 +251,14 @@ import { ReaderSettings } from '../../models';
       accent-color: var(--md-sys-color-primary);
     }
 
-    .theme-options {
+    .theme-options, .option-grid {
       display: flex;
+      flex-wrap: wrap;
       gap: 0.5rem;
     }
-    .theme-options button {
+    .theme-options button, .option-grid button {
       flex: 1;
+      min-width: 120px;
       padding: 0.55rem;
       border: 1px solid var(--glass-border);
       border-radius: var(--radius-medium);
@@ -204,7 +269,7 @@ import { ReaderSettings } from '../../models';
       cursor: pointer;
       transition: all 0.2s;
     }
-    .theme-options button.active {
+    .theme-options button.active, .option-grid button.active {
       background: var(--md-sys-color-primary);
       color: var(--md-sys-color-on-primary);
       border-color: var(--md-sys-color-primary);
@@ -278,6 +343,12 @@ import { ReaderSettings } from '../../models';
 })
 export class SettingsPageComponent {
   readonly reader = computed(() => this.settings.settings().reader);
+  readonly navigation = computed(() => this.settings.settings().navigation || {
+    position: 'floating-bottom',
+    stickiness: 'autohide',
+    oneHandedMode: 'disabled',
+    maxVisibleMobileTabs: 4,
+  });
   readonly syncEnabled = computed(() => this.settings.settings().syncEnabled);
   readonly lastSync = computed(() => this.settings.settings().lastSyncAt);
   readonly backendProxyEnabled = computed(() => !!this.settings.settings().backendProxyEnabled);
@@ -298,6 +369,22 @@ export class SettingsPageComponent {
     if (this.backendProxyEnabled()) {
       this.checkBackendHealth();
     }
+  }
+
+  async setNavPosition(position: NavigationSettings['position']) {
+    await this.settings.updateNavigation({ position });
+  }
+
+  async setNavStickiness(stickiness: NavigationSettings['stickiness']) {
+    await this.settings.updateNavigation({ stickiness });
+  }
+
+  async setOneHandedMode(oneHandedMode: NavigationSettings['oneHandedMode']) {
+    await this.settings.updateNavigation({ oneHandedMode });
+  }
+
+  async setMaxMobileTabs(maxVisibleMobileTabs: number) {
+    await this.settings.updateNavigation({ maxVisibleMobileTabs });
   }
 
   async toggleBackendProxy(event: Event) {

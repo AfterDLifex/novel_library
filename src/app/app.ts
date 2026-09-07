@@ -33,7 +33,7 @@ import { AuthStateService } from './core/auth/auth-state.service';
         </div>
       </header>
 
-      <main class="app-main">
+      <main class="app-main" [class.has-bottom-nav]="navPosition().includes('bottom')" [class.has-top-nav]="navPosition().includes('top')">
         <router-outlet />
       </main>
 
@@ -143,6 +143,10 @@ import { AuthStateService } from './core/auth/auth-state.service';
       position: relative;
       z-index: 1;
       padding-bottom: 1rem;
+      transition: padding 0.3s ease;
+    }
+    .app-main.has-bottom-nav {
+      padding-bottom: 5.5rem;
     }
   `],
   standalone: true,
@@ -151,6 +155,7 @@ import { AuthStateService } from './core/auth/auth-state.service';
 export class App {
   readonly syncing = computed(() => this.syncEngine.syncing());
   readonly currentTheme = computed(() => this.settings.settings().reader.theme || 'dark');
+  readonly navPosition = computed(() => this.settings.settings().navigation?.position || 'floating-bottom');
 
   constructor(
     private theme: ThemeService,
