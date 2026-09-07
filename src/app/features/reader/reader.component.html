@@ -6,11 +6,11 @@
   } @else if (currentChapter()) {
     <header class="reader-header" [class.hidden]="!showControls()">
       <button class="back-btn" (click)="router.navigate(['/novel', novelIdVal])">
-        <app-icon name="back" size="20" />
+        <app-icon name="back" [size]="20" />
       </button>
       <h2>{{ currentChapter()?.title }}</h2>
       <button class="settings-btn" (click)="toggleBottomSheet()">
-        <app-icon name="settings" size="20" />
+        <app-icon name="settings" [size]="20" />
       </button>
     </header>
 
@@ -18,7 +18,7 @@
       <div class="content" #contentEl (scroll)="onScroll()">
         <div class="chapter-content">
           @if (currentChapter()?.content) {
-            <p [innerHTML]="currentChapter()?.content || 'Content not available.'" />
+            <p [innerHTML]="currentChapter()?.content || 'Content not available.'"></p>
           } @else {
             <p class="no-content">Chapter content is not available. This source may not permit content display.</p>
           }
@@ -28,22 +28,22 @@
 
     <footer class="reader-footer" [class.hidden]="!showControls()">
       <div class="progress-bar">
-        <div class="progress-fill" [style.width.%]="progressPercent()" />
+        <div class="progress-fill" [style.width.%]="progressPercent()"></div>
       </div>
 
       <div class="nav-bar">
         <button class="nav-btn" (click)="prevChapter()">
-          <app-icon name="arrowBack" size="20" />
+          <app-icon name="arrowBack" [size]="20" />
         </button>
         <span class="chapter-title">{{ currentChapter()?.title }}</span>
         <button class="nav-btn" (click)="nextChapter()">
-          <app-icon name="arrowForward" size="20" />
+          <app-icon name="arrowForward" [size]="20" />
         </button>
       </div>
     </footer>
 
     <div class="bottom-sheet" [class.open]="isBottomSheetOpen()">
-      <div class="sheet-handle" (click)="toggleBottomSheet()" />
+      <div class="sheet-handle" (click)="toggleBottomSheet()"></div>
       <div class="sheet-content">
         <h3>Reader Settings</h3>
         <div class="setting-group">

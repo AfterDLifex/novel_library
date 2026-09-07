@@ -1,4 +1,9 @@
-import { Directive, ElementRef, Renderer2, OnDestroy } from '@angular/core';
+import {
+  Directive,
+  ElementRef,
+  Renderer2,
+  OnDestroy
+} from '@angular/core';
 
 /**
  * Directive that adds a shadow class to the host element
@@ -12,20 +17,42 @@ export class ScrollShadowDirective implements OnDestroy {
   private scrollHandler: (() => void) | null = null;
 
   constructor(
-    private el: ElementRef,
+    private el: ElementRef<HTMLElement>,
     private renderer: Renderer2
   ) {
-    this.renderer.addClass(this.el.nativeElement, 'scroll-shadow');
+    const element = this.el.nativeElement;
+
+    // Base shadow class
+    this.renderer.addClass(element, 'scroll-shadow');
+
     this.scrollHandler = () => {
-      const hasShadow = this.el.nativeElement.scrollTop > 4;
-      this.renderer.toggleClass(this.el.nativeElement, 'scrolled', hasShadow);
+      const hasShadow = element.scrollTop > 4;
+
+      if (hasShadow) {
+        this.renderer.addClass(element, 'scrolled');
+      } else {
+        this.renderer.removeClass(element, 'scrolled');
+      }
     };
-    this.el.nativeElement.addEventListener('scroll', this.scrollHandler, { passive: true });
+
+    element.addEventListener(
+      'scroll',
+      this.scrollHandler,
+      { passive: true }
+    );
+
+    // Set the initial state
+    this.scrollHandler();
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     if (this.scrollHandler) {
-      this.el.nativeElement.removeEventListener('scroll', this.scrollHandler);
+      this.el.nativeElement.removeEventListener(
+        'scroll',
+        this.scrollHandler
+      );
+
+      this.scrollHandler = null;
     }
   }
 }

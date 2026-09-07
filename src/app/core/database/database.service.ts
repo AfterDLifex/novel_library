@@ -165,6 +165,10 @@ export class DatabaseService {
     }
   }
 
+  async clearHistory(): Promise<void> {
+    await db.history.clear();
+  }
+
   // Collections
   getCollection(id: string): Promise<Collection | undefined> {
     return db.collections.get(id);

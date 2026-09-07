@@ -93,7 +93,7 @@ import { ReaderSettings } from '../../models';
         } @else {
           <div class="setting-group">
             <button class="signin-btn" (click)="signIn()" [disabled]="!clientIdInput">
-              <app-icon name="cloudSync" size="16" /> Sign in with Google
+              <app-icon name="cloudSync" [size]="16" /> Sign in with Google
             </button>
           </div>
         }
@@ -103,16 +103,16 @@ import { ReaderSettings } from '../../models';
         <h2>Data Management</h2>
         <div class="setting-group">
           <button class="action-btn" (click)="exportData()">
-            <app-icon name="addCircle" size="16" /> Export Library (JSON)
+            <app-icon name="addCircle" [size]="16" /> Export Library (JSON)
           </button>
-          <button class="action-btn" (click)="importFile.click()" [disabled]="!importDataText">
-            <app-icon name="addCircle" size="16" /> Import Library (JSON)
+          <button class="action-btn" (click)="importFile.click()" [disabled]="false">
+            <app-icon name="addCircle" [size]="16" /> Import Library (JSON)
           </button>
           <input type="file" #importFile (change)="importFileSelected($event)" accept=".json" style="display: none;" />
         </div>
         <div class="setting-group">
           <button class="destructive-btn" (click)="clearAllData()">
-            <app-icon name="delete" size="16" /> Clear All Data
+            <app-icon name="delete" [size]="16" /> Clear All Data
           </button>
           <p class="hint">This will remove all your novels, progress, and settings. This action cannot be undone.</p>
         </div>
@@ -150,7 +150,11 @@ export class SettingsPageComponent {
   readonly syncEnabled = computed(() => this.settings.settings().syncEnabled);
   readonly lastSync = computed(() => this.settings.settings().lastSyncAt);
 
-      clientIdInput = '';
+  clientIdInput = '';
+
+  readonly authenticated;
+  readonly user;
+  readonly syncing;
 
   constructor(
     private settings: SettingsService,
@@ -158,12 +162,13 @@ export class SettingsPageComponent {
     private syncEngine: SyncEngineService,
     private db: DatabaseService,
   ) {
-    this.clientIdInput = this.settings.settings().googleClientId ?? '';
-  }
+    this.clientIdInput =
+      this.settings.settings().googleClientId ?? '';
 
-  readonly authenticated = this.auth.authenticated;
-  readonly user = this.auth.user;
-  readonly syncing = this.syncEngine.syncing;
+    this.authenticated = this.auth.authenticated;
+    this.user = this.auth.user;
+    this.syncing = this.syncEngine.syncing;
+  }
 
   async setTheme(theme: ReaderSettings['theme']) {
     await this.settings.updateReader({ theme });
@@ -190,7 +195,7 @@ export class SettingsPageComponent {
     await this.settings.updateReader({ keepScreenAwake: checked });
   }
 
-    async saveClientId() {
+  async saveClientId() {
     await this.settings.update({ googleClientId: this.clientIdInput });
     localStorage.setItem('google_client_id', this.clientIdInput);
     this.auth.signIn();

@@ -26,7 +26,7 @@ export class ReaderSettingsService {
   // CSS variables applied to the reader container
   readonly readerStyle = computed(() => ({
     '--reader-font-size': `${this.fontSize()}px`,
-    '--reader-line-height': this.lineHeight(),
+    '--reader-line-height': `${this.lineHeight()}`,
     '--reader-font-family': this.fontFamily(),
     '--reader-content-width': `${this.contentWidth()}px`,
   } as Record<string, string>));
@@ -75,10 +75,10 @@ export class ReaderSettingsService {
         this.wakeLock = await (navigator as any).wakeLock.request('screen');
       } else {
         // Fallback: use a no-op interval to keep screen awake
-        this.keepAwakeInterval = window.setInterval(() => {}, 60000);
+        this.keepAwakeInterval = window.setInterval(() => { }, 60000);
       }
     } catch {
-      this.keepAwakeInterval = window.setInterval(() => {}, 60000);
+      this.keepAwakeInterval = window.setInterval(() => { }, 60000);
     }
   }
 
