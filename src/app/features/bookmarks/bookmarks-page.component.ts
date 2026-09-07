@@ -53,9 +53,13 @@ import { DatabaseService } from '../../core/database/database.service';
       display: flex;
       gap: 0.75rem;
       align-items: center;
-      padding: 0.5rem;
-      border-radius: 0.5rem;
-      background: var(--md-sys-color-surface);
+      padding: 0.55rem;
+      border-radius: 0.65rem;
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
     }
     app-cover-image { width: 48px; min-width: 48px; }
     .info { flex: 1; min-width: 0; }

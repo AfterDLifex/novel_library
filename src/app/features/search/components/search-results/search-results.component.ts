@@ -45,17 +45,18 @@ import { SourceBadgeComponent } from '../source-badge/source-badge.component';
       display: flex;
       gap: 0.85rem;
       align-items: stretch;
-      padding: 0.85rem;
-      border-radius: var(--radius-medium);
-      background: var(--md-sys-color-surface);
-      border: 1px solid var(--md-sys-color-outline-variant);
-      box-shadow: var(--md-sys-elevation-1);
-      transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+      padding: 0.9rem;
+      border-radius: var(--radius-medium, 0.75rem);
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      transition: box-shadow 0.2s, transform 0.2s var(--ease-out), border-color 0.2s;
     }
     .result-card:hover {
-      box-shadow: var(--md-sys-elevation-3);
-      transform: translateY(-1px);
-      border-color: color-mix(in srgb, var(--md-sys-color-primary) 35%, var(--md-sys-color-outline-variant));
+      transform: translateY(-2px);
+      border-color: color-mix(in srgb, var(--md-sys-color-primary) 35%, var(--glass-border));
     }
     .card-link {
       display: flex;

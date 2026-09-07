@@ -101,21 +101,22 @@ import { NovelSearchResult } from '../../../../models';
     .page-title { font-size: 1.35rem; font-weight: 700; margin: 0 0 0.15rem; letter-spacing: -0.01em; }
     .page-subtitle { font-size: 0.8rem; color: var(--md-sys-color-on-surface-variant); margin: 0 0 1rem; }
     .search-header { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
-    .search-box { flex: 1; display: flex; align-items: center; gap: 0.5rem; padding: 0.65rem 0.9rem; background: var(--md-sys-color-surface); border: 1px solid var(--md-sys-color-outline-variant); border-radius: 1.5rem; transition: border-color .2s, box-shadow .2s; }
-    .search-box:focus-within { border-color: var(--md-sys-color-primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-sys-color-primary) 15%, transparent); }
+    .search-box { flex: 1; display: flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1rem; background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur)) saturate(1.4); -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4); border: 1px solid var(--glass-border); border-radius: 1.6rem; box-shadow: var(--glass-shadow); transition: border-color .2s, box-shadow .2s; }
+    .search-box:hover { border-color: color-mix(in srgb, var(--md-sys-color-primary) 30%, var(--glass-border)); }
+    .search-box:focus-within { border-color: var(--md-sys-color-primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-sys-color-primary) 18%, transparent), var(--glass-shadow); }
     .search-box app-icon { color: var(--md-sys-color-on-surface-variant); }
     .search-box input { flex: 1; border: none; outline: none; background: transparent; color: var(--md-sys-color-on-surface); font-size: 0.95rem; min-width: 0; }
     .search-btn { padding: 0.65rem 1.25rem; background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); border: none; border-radius: 1.5rem; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all .2s; }
     .search-btn:hover:not(:disabled) { filter: brightness(1.08); box-shadow: var(--md-sys-elevation-2); }
     .search-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .source-filters { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
-    .filter-toggle { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.4rem 0.8rem; border: 1px solid var(--md-sys-color-outline-variant); border-radius: 1rem; background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface); font-size: 0.75rem; cursor: pointer; transition: all 0.2s; }
+    .filter-toggle { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.45rem 0.9rem; border: 1px solid var(--glass-border); border-radius: 1rem; background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur)) saturate(1.3); -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.3); color: var(--md-sys-color-on-surface); font-size: 0.75rem; cursor: pointer; transition: all 0.2s; }
     .filter-toggle:hover { border-color: var(--md-sys-color-primary); }
-    .filter-toggle.active { border-color: var(--md-sys-color-primary); color: var(--md-sys-color-primary); background: color-mix(in srgb, var(--md-sys-color-primary) 8%, transparent); }
+    .filter-toggle.active { border-color: var(--md-sys-color-primary); color: var(--md-sys-color-primary); background: color-mix(in srgb, var(--md-sys-color-primary) 10%, var(--glass-bg)); }
     .filter-toggle .rotated { transform: rotate(90deg); transition: transform .2s; }
     .active-count { font-size: 0.7rem; color: var(--md-sys-color-on-surface-variant); }
-    .source-list { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; padding: 0.75rem; background: var(--md-sys-color-surface-variant); border-radius: var(--radius-medium); }
-    .source-chip { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.7rem; border: 1px solid transparent; border-radius: 1rem; background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface); font-size: 0.72rem; cursor: pointer; transition: all 0.2s; }
+    .source-list { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; padding: 0.8rem; background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur)) saturate(1.35); -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.35); border: 1px solid var(--glass-border); border-radius: var(--radius-medium, 0.75rem); box-shadow: var(--glass-shadow); }
+    .source-chip { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.7rem; border: 1px solid transparent; border-radius: 1rem; background: var(--glass-bg); color: var(--md-sys-color-on-surface); font-size: 0.72rem; cursor: pointer; transition: all 0.2s; }
     .source-chip:hover { border-color: var(--md-sys-color-primary); }
     .source-chip.active { background: color-mix(in srgb, var(--md-sys-color-primary) 14%, var(--md-sys-color-surface)); border-color: var(--md-sys-color-primary); color: var(--md-sys-color-primary); font-weight: 600; }
     .chip-name { white-space: nowrap; }

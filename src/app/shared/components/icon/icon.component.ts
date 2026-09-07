@@ -1,20 +1,95 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+/**
+ * A small shape-DSL used to draw crisp, stroke-based SVG icons.
+ * Rendering primitives directly (path / circle / ellipse / rect / line)
+ * keeps the markup safe (no innerHTML), theme-aware (currentColor) and
+ * identical in weight across every size.
+ */
+interface PathPrim {
+  t: 'p';
+  d: string;
+  f?: string;
+  w?: number;
+}
+interface CirclePrim {
+  t: 'c';
+  cx: number;
+  cy: number;
+  r: number;
+  f?: string;
+}
+interface RectPrim {
+  t: 'r';
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  rx?: number;
+  f?: string;
+}
+interface EllipsePrim {
+  t: 'e';
+  cx: number;
+  cy: number;
+  rx: number;
+  ry: number;
+  f?: string;
+}
+interface LinePrim {
+  t: 'l';
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+}
+type Prim = PathPrim | CirclePrim | RectPrim | EllipsePrim | LinePrim;
+
+const p = (d: string, f?: string, w?: number): Prim => ({ t: 'p', d, f, w });
+const c = (cx: number, cy: number, r: number, f?: string): Prim => ({ t: 'c', cx, cy, r, f });
+const r = (x: number, y: number, w: number, h: number, rx?: number, f?: string): Prim => ({ t: 'r', x, y, w, h, rx, f });
+const e = (cx: number, cy: number, rx: number, ry: number, f?: string): Prim => ({ t: 'e', cx, cy, rx, ry, f });
+const l = (x1: number, y1: number, x2: number, y2: number): Prim => ({ t: 'l', x1, y1, x2, y2 });
 
 @Component({
   selector: 'app-icon',
   template: `
-    <svg [attr.viewBox]="viewBox" [attr.width]="size" [attr.height]="size" fill="currentColor" aria-hidden="true">
-      <path [attr.d]="path" />
+    <svg
+      [attr.viewBox]="viewBox"
+      [attr.width]="size"
+      [attr.height]="size"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <ng-container *ngFor="let s of shapes">
+        <path *ngIf="s.t === 'p'" [attr.d]="s.d" [attr.fill]="s.f ?? null" [attr.stroke-width]="s.w ?? null" />
+        <circle *ngIf="s.t === 'c'" [attr.cx]="s.cx" [attr.cy]="s.cy" [attr.r]="s.r" [attr.fill]="s.f ?? null" />
+        <rect *ngIf="s.t === 'r'" [attr.x]="s.x" [attr.y]="s.y" [attr.width]="s.w" [attr.height]="s.h" [attr.rx]="s.rx ?? null" [attr.fill]="s.f ?? null" />
+        <ellipse *ngIf="s.t === 'e'" [attr.cx]="s.cx" [attr.cy]="s.cy" [attr.rx]="s.rx" [attr.ry]="s.ry" [attr.fill]="s.f ?? null" />
+        <line *ngIf="s.t === 'l'" [attr.x1]="s.x1" [attr.y1]="s.y1" [attr.x2]="s.x2" [attr.y2]="s.y2" />
+      </ng-container>
     </svg>
   `,
-  styles: [`
+  styles: [
+    `
     :host {
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
     }
-  `],
+    :host-context(svg) {
+      vertical-align: middle;
+    }
+  `,
+  ],
   standalone: true,
+  imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IconComponent {
@@ -22,47 +97,69 @@ export class IconComponent {
   @Input() size = 24;
 
   protected viewBox = '0 0 24 24';
-  protected path = '';
-
-  protected readonly iconData = iconRegistry;
+  protected shapes: Prim[] = [];
 
   ngOnChanges() {
-    const data = this.iconData[this.name as IconName];
-    if (data) {
-      this.viewBox = data.viewBox;
-      this.path = data.path;
-    }
+    this.shapes = iconRegistry[this.name] ?? [];
   }
 }
 
 export type IconName = keyof typeof iconRegistry;
 
+/** Premium, hand-tuned stroke icons (24x24 viewBox) */
 const iconRegistry = {
-  home: { viewBox: '0 0 24 24', path: 'M12 3l9 8h-3v9h-4v-6H10v6H6v-9H3z' },
-  search: { viewBox: '0 0 24 24', path: 'M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.16 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.66 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.62 14 5 11.38 5 8.5S7.62 3 10.5 3 16 5.62 16 8.5 13.38 14 10.5 14z' },
-  library: { viewBox: '0 0 24 24', path: 'M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm17-3H6v14h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 13h-1V8H7v11h14z' },
-  bookmarks: { viewBox: '0 0 24 24', path: 'M19 19V5l-7 4-7-4v14l7 4 7-4z' },
-  history: { viewBox: '0 0 24 24', path: 'M13 3a9 9 0 0 7-9 9H3c0 5.52 4.48 10 10 10 5.52 0 10-4.48 10-10v-1h-1zm-1 8l4.5-2.5L16 13l-4 2.25V11z' },
-  collections: { viewBox: '0 0 24 24', path: 'M4 6h16v2H4zm0 4h16v10H4zm0 12h16v2H4z' },
-  settings: { viewBox: '0 0 24 24', path: 'M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z' },
-  close: { viewBox: '0 0 24 24', path: 'M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z' },
-  back: { viewBox: '0 0 24 24', path: 'M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20z' },
-  add: { viewBox: '0 0 24 24', path: 'M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z' },
-  addCircle: { viewBox: '0 0 24 24', path: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z' },
-  check: { viewBox: '0 0 24 24', path: 'M9 16.17L4.83 12l-1.42 1.41L9 19 20.59 7.83 19 6.24z' },
-  delete: { viewBox: '0 0 24 24', path: 'M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1H9.5l-1 1H5v2h14V4z' },
-  edit: { viewBox: '0 0 24 24', path: 'M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm2.74-2.74l9.19-9.19 1.86 1.86-9.19 9.19H4.5v-1.85l-.26-.26zm3.45-1.25l5.18-5.18 1.41 1.41-5.18 5.18H9.74v-1.41l-.25-.25z' },
-  moreVert: { viewBox: '0 0 24 24', path: 'M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z' },
-  star: { viewBox: '0 0 24 24', path: 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7.91 15.14 4 9.27z' },
-  starBorder: { viewBox: '0 0 24 24', path: 'M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z' },
-  arrowForward: { viewBox: '0 0 24 24', path: 'M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z' },
-  arrowBack: { viewBox: '0 0 24 24', path: 'M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20z' },
-  cloudSync: { viewBox: '0 0 24 24', path: 'M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z' },
-  error: { viewBox: '0 0 24 24', path: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z' },
-  visibility: { viewBox: '0 0 24 24', path: 'M12 4.5C7 4.5 2.73 7.75 2 12.5c.73 4.75 5 8 10 8s9.27-3.25 10-8c-.73-4.75-5-8-10-8zm0 13.5c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z' },
-  source: { viewBox: '0 0 24 24', path: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z' },
-  filter: { viewBox: '0 0 24 24', path: 'M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z' },
-  refresh: { viewBox: '0 0 24 24', path: 'M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z' },
-  globe: { viewBox: '0 0 24 24', path: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z' },
-  book: { viewBox: '0 0 24 24', path: 'M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z' },
+  home: [
+    p('M3.6 11.8H20.4'),
+    p('M4.6 11.8V8.4M19.4 11.8V8.4'),
+    p('M4.6 8.4l7.4-4.6M19.4 8.4l-7.4-4.6'),
+    p('M11 11.8v3.6'),
+  ],
+  search: [c(10.4, 10.6, 7.2), p('M13.6 11.8l3.8 4.2')],
+  library: [
+    p('M4.6 5.6H19.4M4.6 9.8H19.4M4.6 14H19.4M4.6 18.2H19.4'),
+    p('M5.8 5.6v4.2M9.6 9.8v4.2M6.8 14v4.2M13.6 14v4.2M16.6 9.8v4.2M17.8 5.6v4.2'),
+  ],
+  bookmarks: [
+    p('M9.6 4.4V16M15.6 4.4V16M9.6 4.4H15.6'),
+    p('M11 15l1.6-2.4M15.6 15l-1.6-2.4'),
+  ],
+  history: [c(12, 12, 8.2), p('M12 12V6.4M12 12l4.6 0M9.4 12l-.6 0')],
+  collections: [r(4, 5, 16, 14, 1.2), p('M5.6 9.4h12.8M5.6 9.4v6M18.4 9.4v6')],
+  settings: [
+    c(12, 12, 5.6),
+    c(12, 12, 1.7),
+    p('M12 6.4v10.4M6.4 12h11.2M12 6.4l3.5 3.5M12 6.4l-3.5 3.5M12 16.8l3.5-3.5M12 16.8l-3.5-3.5'),
+  ],
+  close: [p('M6.2 6.2l11.6 11.6M17.8 6.2l-11.6 11.6')],
+  back: [p('M20.2 12H13M13 12l-2.4-3.4M13 12l-2.4 3.4')],
+  add: [p('M7.6 12h8.8M12 7.6v8.8')],
+  addCircle: [c(12, 12, 8.6), p('M9.2 12h5.6M12 9.2v5.6')],
+  check: [p('M4.6 15l2.2 5.2M7.8 13l1.6 2.4M9.2 9.6l6.8-6.8')],
+  delete: [
+    p('M6.4 4.8h11.2M7.4 6.4h9.2'),
+    p('M8 6.4v9.6M16 6.4v9.6M8 16h8'),
+    p('M7 6.4l.8-1.5M17 6.4l-.8-1.5'),
+    p('M9 6.4h6'),
+  ],
+  edit: [r(9.2, 4, 5.6, 13.6, 1.2), p('M9.7 17.6l2.3-3M15.3 17.6l-2.3-3')],
+  moreVert: [c(12, 6, 1.6), c(12, 12, 1.6), c(12, 18, 1.6)],
+  star: [p('M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7.91 15.14 4 9.27z', 'currentColor', 0)],
+  starBorder: [p('M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24z', undefined, 1.5)],
+  arrowForward: [p('M3.6 12H10.6M10.6 12l2.5-3.5M10.6 12l2.5 3.5')],
+  arrowBack: [p('M20.4 12H13.4M13.4 12l-2.5-3.5M13.4 12l-2.5 3.5')],
+  cloudSync: [
+    c(7.6, 13, 3.6),
+    c(12, 13, 3.6),
+    c(16.4, 13, 3.6),
+    p('M12 10.2v-3M12 7.2l1.3-1.3M12 15.8v3'),
+  ],
+  error: [p('M7 5.8h10M7 5.8l5 11.4M17 5.8l-5 11.4M12 11.6v-3M12 15.9v1.1')],
+  visibility: [e(12.2, 11.8, 5.8, 4.3), c(12.2, 12, 1.9)],
+  source: [c(12, 12, 7.2), p('M5.4 12h13.2M12 5.4v13.2')],
+  filter: [p('M8.4 5.2h7.2M9.6 7.8l1.8 4.8M16.2 7.8l-1.8 4.8M11.4 15l.4 2.4')],
+  refresh: [c(12, 12, 6.4), p('M12 6.6l-1.6 2.8M12 9.4l3.1-1.6')],
+  globe: [c(12, 12, 7.2), p('M5.4 12h13.2'), e(12, 12, 4.2, 7.2), e(12, 12, 7.2, 4.2)],
+  book: [
+    p('M12 6.6v10.4M12 6.6l-7.4 7.6M12 6.6l7.4 7.6M4.6 14.2h7.4M11.2 14.2h1.4'),
+  ],
 };

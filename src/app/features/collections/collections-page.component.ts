@@ -60,7 +60,17 @@ import { DatabaseService } from '../../core/database/database.service';
     .page-header h1 { font-size: 1.25rem; margin: 0; }
     .add-btn { display: flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.8rem; background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); border: none; border-radius: 0.5rem; cursor: pointer; font-size: 0.85rem; }
     .collections-list { display: flex; flex-direction: column; gap: 0.5rem; }
-    .collection-card { padding: 0.75rem; border-radius: 0.5rem; background: var(--md-sys-color-surface); box-shadow: var(--md-sys-elevation-1); }
+    .collection-card {
+      padding: 0.85rem;
+      border-radius: 0.75rem;
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      transition: transform 0.2s var(--ease-out), border-color 0.2s ease;
+    }
+    .collection-card:hover { border-color: color-mix(in srgb, var(--md-sys-color-primary) 28%, var(--glass-border)); transform: translateY(-1px); }
     .collection-header { display: flex; justify-content: space-between; align-items: center; }
     .collection-header h3 { font-size: 1rem; margin: 0; }
     .menu-btn { background: none; border: none; cursor: pointer; padding: 0.2rem; color: var(--md-sys-color-on-surface-variant); }
@@ -68,8 +78,8 @@ import { DatabaseService } from '../../core/database/database.service';
     .novels-count { font-size: 0.75rem; color: var(--md-sys-color-on-surface-variant); margin: 0.25rem 0; }
     .tags { display: flex; gap: 0.25rem; flex-wrap: wrap; }
     .tag { font-size: 0.7rem; background: color-mix(in srgb, var(--md-sys-color-primary) 10%, transparent); color: var(--md-sys-color-primary); padding: 0.1rem 0.4rem; border-radius: 0.25rem; }
-    .overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 200; }
-    .dialog { background: var(--md-sys-color-surface); border-radius: 0.75rem; padding: 1.5rem; width: 90%; max-width: 400px; }
+    .overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 200; }
+    .dialog { background: var(--glass-bg-strong); backdrop-filter: blur(var(--glass-blur-strong)) saturate(1.5); -webkit-backdrop-filter: blur(var(--glass-blur-strong)) saturate(1.5); border: 1px solid var(--glass-border); border-radius: 0.9rem; padding: 1.5rem; width: 90%; max-width: 400px; box-shadow: var(--glass-shadow); }
     .dialog h3 { margin: 0 0 1rem; }
     .dialog input, .dialog textarea { width: 100%; padding: 0.5rem; border: 1px solid var(--md-sys-color-outline-variant); border-radius: 0.3rem; background: var(--md-sys-color-surface-container); color: var(--md-sys-color-on-surface); margin-bottom: 0.5rem; font-family: inherit; }
     .dialog textarea { min-height: 80px; resize: vertical; }

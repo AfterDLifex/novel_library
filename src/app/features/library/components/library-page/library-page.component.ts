@@ -74,10 +74,12 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
     }
     .filters { display: flex; gap: 0.25rem; flex-wrap: wrap; }
     .filter-btn {
-      padding: 0.3rem 0.8rem;
-      border: 1px solid var(--md-sys-color-outline-variant);
-      border-radius: 0.5rem;
-      background: var(--md-sys-color-surface);
+      padding: 0.35rem 0.85rem;
+      border: 1px solid var(--glass-border);
+      border-radius: 0.6rem;
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur)) saturate(1.3);
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.3);
       color: var(--md-sys-color-on-surface-variant);
       font-size: 0.8rem;
       cursor: pointer;
@@ -92,11 +94,14 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
     .view-btn {
       width: 36px;
       height: 36px;
-      border: 1px solid var(--md-sys-color-outline-variant);
-      border-radius: 0.4rem;
-      background: var(--md-sys-color-surface);
+      border: 1px solid var(--glass-border);
+      border-radius: 0.5rem;
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur)) saturate(1.3);
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.3);
       color: var(--md-sys-color-on-surface-variant);
       cursor: pointer;
+      transition: all .2s;
     }
     .view-btn.active {
       background: color-mix(in srgb, var(--md-sys-color-primary) 15%, transparent);

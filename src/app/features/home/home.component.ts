@@ -86,9 +86,17 @@ import { LibraryStore } from '../library/library.store';
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 0.5rem;
+      gap: 0.6rem;
     }
     app-novel-card { width: 100%; }
+    @media (max-width: 640px) {
+      .home { padding: 0.9rem 0.75rem; }
+      .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.5rem; }
+    }
+    @media (max-width: 400px) {
+      .grid { grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+      .section-header h2 { font-size: 1rem; }
+    }
     .action-btn {
       display: flex;
       align-items: center;

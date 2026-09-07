@@ -33,16 +33,22 @@ import { CoverImageComponent } from '../cover-image/cover-image.component';
       gap: 0.5rem;
       text-decoration: none;
       color: inherit;
-      padding: 0.5rem;
-      border-radius: 0.75rem;
-      background: var(--md-sys-color-surface);
-      box-shadow: var(--md-sys-elevation-1, 0 1px 2px rgba(0,0,0,0.08));
-      transition: box-shadow 0.2s ease;
+      padding: 0.65rem;
+      border-radius: 0.9rem;
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      transition: box-shadow 0.2s ease, transform 0.22s var(--ease-out), border-color 0.2s ease;
       position: relative;
       height: 100%;
       align-items: center;
     }
-    .card:hover { box-shadow: var(--md-sys-elevation-2, 0 2px 4px rgba(0,0,0,0.12)); }
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: color-mix(in srgb, var(--md-sys-color-primary) 28%, var(--glass-border));
+    }
     app-cover-image { width: 48px; min-width: 48px; }
     .info { flex: 1; min-width: 0; }
     h3 { font-size: 0.9rem; font-weight: 600; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

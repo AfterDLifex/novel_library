@@ -30,9 +30,13 @@ import { ScrollShadowDirective } from '../../../shared/directives/scroll-shadow.
   `,
   styles: [`
     .chapter-list {
-      border: 1px solid var(--md-sys-color-outline-variant);
-      border-radius: 0.5rem;
+      border: 1px solid var(--glass-border);
+      border-radius: 0.75rem;
       overflow: hidden;
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur)) saturate(1.35);
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.35);
+      box-shadow: var(--glass-shadow);
     }
     .viewport { height: 300px; width: 100%; }
     .chapter-item {

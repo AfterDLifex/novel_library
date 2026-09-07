@@ -44,8 +44,24 @@ import { DatabaseService } from '../../core/database/database.service';
     .page-header h1 { font-size: 1.25rem; margin: 0; }
     .clear-btn { background: none; border: 1px solid var(--md-sys-color-outline-variant); border-radius: 0.3rem; padding: 0.2rem 0.6rem; cursor: pointer; font-size: 0.8rem; color: var(--md-sys-color-on-surface-variant); }
     .viewport { height: calc(100dvh - 180px); width: 100%; }
-    .history-item { display: flex; gap: 0.75rem; align-items: center; padding: 0.5rem; border-radius: 0.5rem; background: var(--md-sys-color-surface); cursor: pointer; }
-    .history-item:hover { background: color-mix(in srgb, var(--md-sys-color-on-surface) 4%, transparent); }
+    .history-item {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      padding: 0.55rem;
+      border-radius: 0.65rem;
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      cursor: pointer;
+      transition: border-color 0.2s ease, transform 0.2s var(--ease-out);
+    }
+    .history-item:hover {
+      border-color: color-mix(in srgb, var(--md-sys-color-primary) 28%, var(--glass-border));
+      transform: translateY(-1px);
+    }
     app-cover-image { width: 48px; min-width: 48px; }
     .info { flex: 1; min-width: 0; }
     h3 { font-size: 0.9rem; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

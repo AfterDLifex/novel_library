@@ -147,15 +147,16 @@ import { ReaderSettings } from '../../models';
   styles: [`
     .page { padding: 1rem; }
     h1 { font-size: 1.5rem; margin: 0 0 1rem; }
-    .settings-section { margin-bottom: 2rem; padding: 1rem; border-radius: 0.5rem; background: var(--md-sys-color-surface); box-shadow: var(--md-sys-elevation-1); }
+    .settings-section { margin-bottom: 2rem; padding: 1.1rem; border-radius: 0.9rem; background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur)) saturate(1.4); -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4); border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow); }
     .settings-section h2 { font-size: 1.1rem; margin: 0 0 0.75rem; }
     .setting-group { margin-bottom: 1rem; }
     .setting-group label { display: block; font-size: 0.85rem; margin-bottom: 0.3rem; color: var(--md-sys-color-on-surface-variant); }
-    .setting-group input[type="text"], .setting-group select { width: 100%; padding: 0.4rem 0.5rem; border: 1px solid var(--md-sys-color-outline-variant); border-radius: 0.3rem; background: var(--md-sys-color-surface-container); color: var(--md-sys-color-on-surface); }
+    .setting-group input[type="text"], .setting-group select { width: 100%; padding: 0.5rem 0.6rem; border: 1px solid var(--glass-border); border-radius: 0.5rem; background: color-mix(in srgb, var(--glass-bg) 85%, transparent); color: var(--md-sys-color-on-surface); transition: border-color .2s, box-shadow .2s; }
+    .setting-group input[type="text"]:focus, .setting-group select:focus { border-color: var(--md-sys-color-primary); box-shadow: 0 0 0 2px color-mix(in srgb, var(--md-sys-color-primary) 18%, transparent); outline: none; }
     .theme-options { display: flex; gap: 0.25rem; }
-    .theme-options button { flex: 1; padding: 0.4rem; border: 1px solid var(--md-sys-color-outline-variant); border-radius: 0.3rem; cursor: pointer; }
+    .theme-options button { flex: 1; padding: 0.4rem; border: 1px solid var(--glass-border); border-radius: 0.5rem; cursor: pointer; background: var(--glass-bg); transition: all .2s; }
     .theme-options button.active { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); border-color: var(--md-sys-color-primary); }
-    .setting-group input[type="checkbox"] { margin-right: 0.3rem; }
+    .setting-group input[type="checkbox"] { margin-right: 0.4rem; accent-color: var(--md-sys-color-primary); }
     .action-btn, .signin-btn, .sync-btn, .destructive-btn { display: flex; align-items: center; gap: 0.3rem; width: 100%; padding: 0.5rem 0.75rem; border: none; border-radius: 0.3rem; cursor: pointer; font-weight: 600; }
     .action-btn { background: color-mix(in srgb, var(--md-sys-color-primary) 10%, transparent); color: var(--md-sys-color-primary); }
     .signin-btn { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
