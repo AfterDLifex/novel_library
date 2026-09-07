@@ -1,0 +1,121 @@
+﻿/* Material Design 3 color system tokens */
+:root {
+  --md-sys-color-primary: #6750a4;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #eaddff;
+  --md-sys-color-on-primary-container: #21006e;
+  --md-sys-color-secondary: #625b71;
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-secondary-container: #e8def8;
+  --md-sys-color-on-secondary-container: #21006e;
+  --md-sys-color-tertiary: #7d5260;
+  --md-sys-color-on-tertiary: #ffffff;
+  --md-sys-color-tertiary-container: #ffd8e4;
+  --md-sys-color-on-tertiary-container: #31001d;
+  --md-sys-color-error: #b00020;
+  --md-sys-color-on-error: #ffffff;
+  --md-sys-color-error-container: #fcd8df;
+  --md-sys-color-on-error-container: #820000;
+  --md-sys-color-background: #fdfbff;
+  --md-sys-color-on-background: #1c1b1f;
+  --md-sys-color-surface: #fdfbff;
+  --md-sys-color-on-surface: #1c1b1f;
+  --md-sys-color-surface-variant: #e7e0f0;
+  --md-sys-color-on-surface-variant: #49454e;
+  --md-sys-color-outline: #79747e;
+  --md-sys-color-outline-variant: #e7e0f0;
+  --md-sys-color-inverse-surface: #312f36;
+  --md-sys-color-inverse-on-surface: #f5eff7;
+  --md-sys-color-inverse-primary: #d0bcff;
+  --md-sys-elevation-0: 0 0 #0000;
+  --md-sys-elevation-1: 0 1px 2px rgba(0,0,0,0.08);
+  --md-sys-elevation-2: 0 2px 4px rgba(0,0,0,0.12);
+  --md-sys-elevation-3: 0 3px 6px rgba(0,0,0,0.16);
+  --md-sys-elevation-4: 0 4px 8px rgba(0,0,0,0.20);
+  --md-sys-elevation-5: 0 5px 12px rgba(0,0,0,0.24);
+  --radius-small: 0.5rem;
+  --radius-medium: 0.75rem;
+  --radius-large: 1.25rem;
+}
+
+body.theme-dark {
+  --md-sys-color-primary: #d0bcff;
+  --md-sys-color-on-primary: #21006e;
+  --md-sys-color-primary-container: #381e72;
+  --md-sys-color-on-primary-container: #eaddff;
+  --md-sys-color-secondary: #cbb8e0;
+  --md-sys-color-on-secondary: #332e41;
+  --md-sys-color-secondary-container: #4a4459;
+  --md-sys-color-on-secondary-container: #e8def8;
+  --md-sys-color-tertiary: #ec7896;
+  --md-sys-color-on-tertiary: #560026;
+  --md-sys-color-tertiary-container: #b2375a;
+  --md-sys-color-on-tertiary-container: #ffd8e4;
+  --md-sys-color-error: #ffb4a9;
+  --md-sys-color-on-error: #680014;
+  --md-sys-color-error-container: #9b000b;
+  --md-sys-color-on-error-container: #fcd8df;
+  --md-sys-color-background: #121214;
+  --md-sys-color-on-background: #e0e0e0;
+  --md-sys-color-surface: #121214;
+  --md-sys-color-on-surface: #e0e0e0;
+  --md-sys-color-surface-variant: #49454e;
+  --md-sys-color-on-surface-variant: #cbc7d1;
+  --md-sys-color-outline: #938e98;
+  --md-sys-color-outline-variant: #49454e;
+  --md-sys-color-inverse-surface: #fdfbff;
+  --md-sys-color-inverse-on-surface: #1c1b1f;
+  --md-sys-color-inverse-primary: #6750a4;
+}
+
+body.theme-sepia {
+  --md-sys-color-primary: #96825b;
+  --md-sys-color-on-primary: #3e2723;
+  --md-sys-color-primary-container: #e9dcc9;
+  --md-sys-color-on-primary-container: #5d4037;
+  --md-sys-color-secondary: #a1887f;
+  --md-sys-color-on-secondary: #3e2723;
+  --md-sys-color-secondary-container: #d7ccc8;
+  --md-sys-color-on-secondary-container: #4e342e;
+  --md-sys-color-tertiary: #8d6e63;
+  --md-sys-color-on-tertiary: #3e2723;
+  --md-sys-color-tertiary-container: #d7ccc8;
+  --md-sys-color-on-tertiary-container: #4e342e;
+  --md-sys-color-error: #b00020;
+  --md-sys-color-on-error: #ffffff;
+  --md-sys-color-error-container: #fcd8df;
+  --md-sys-color-on-error-container: #820000;
+  --md-sys-color-background: #f5f0e6;
+  --md-sys-color-on-background: #3e2723;
+  --md-sys-color-surface: #f5f0e6;
+  --md-sys-color-on-surface: #3e2723;
+  --md-sys-color-surface-variant: #e0d0c0;
+  --md-sys-color-on-surface-variant: #795736;
+  --md-sys-color-outline: #a1887f;
+  --md-sys-color-outline-variant: #e0d0c0;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--md-sys-color-background);
+  color: var(--md-sys-color-on-background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* { box-sizing: border-box; }
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--md-sys-color-outline-variant); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--md-sys-color-outline); }
+
+/* Focus styles */
+:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+}
