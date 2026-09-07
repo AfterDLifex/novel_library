@@ -1,0 +1,20 @@
+.details-page { padding: 1rem; }
+.loading { display: flex; justify-content: center; padding: 2rem; }
+.retry-btn { margin-top: 0.5rem; padding: 0.4rem 1rem; }
+.novel-detail { max-width: 800px; margin: 0 auto; }
+.header { display: flex; gap: 1rem; align-items: flex-start; }
+app-cover-image { width: 120px; min-width: 120px; }
+.info { flex: 1; min-width: 0; }
+h1 { font-size: 1.5rem; margin: 0 0 0.25rem; }
+.author { font-size: 1rem; color: var(--md-sys-color-on-surface-variant); margin: 0 0 0.5rem; }
+.genres { display: flex; gap: 0.25rem; flex-wrap: wrap; margin: 0.5rem 0; }
+.genre { font-size: 0.75rem; background: color-mix(in srgb, var(--md-sys-color-primary) 10%, transparent); color: var(--md-sys-color-primary); padding: 0.1rem 0.4rem; border-radius: 0.25rem; }
+.chapters-count { font-size: 0.85rem; color: var(--md-sys-color-on-surface-variant); margin: 0.5rem 0; }
+.actions { display: flex; gap: 0.5rem; margin: 0.75rem 0; }
+.primary-btn, .secondary-btn { padding: 0.5rem 1rem; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 0.3rem; }
+.primary-btn { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+.secondary-btn { background: color-mix(in srgb, var(--md-sys-color-secondary) 15%, transparent); color: var(--md-sys-color-secondary); }
+.description { margin: 1.5rem 0; }
+.description h2, .chapters h2 { font-size: 1.1rem; margin: 0 0 0.5rem; }
+.description p { font-size: 0.85rem; line-height: 1.6; color: var(--md-sys-color-on-surface-variant); white-space: pre-line; }
+.chapters { margin-top: 1.5rem; }

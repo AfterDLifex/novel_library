@@ -1,0 +1,45 @@
+@if (loading()) {
+  <div class="loading"><app-loading-spinner /></div>
+} @else if (error()) {
+  <app-error-message [message]="error()" />
+  <button class="retry-btn" (click)="load()">Retry</button>
+} @else if (details()) {
+  <div class="novel-detail">
+    <div class="header">
+      <app-cover-image [src]="details()?.coverUrl" [alt]="details()?.title" [aspectRatio]="'2/3'" />
+      <div class="info">
+        <h1>{{ details()?.title }}</h1>
+        @if (details()?.author) {
+          <p class="author">{{ details()?.author }}</p>
+        }
+        <app-status-badge [status]="details()?.status ?? 'unknown'" />
+        <div class="genres" *ngIf="details()?.genres?.length">
+          <span class="genre" *ngFor="let g of details()?.genres">{{ g }}</span>
+        </div>
+        <p class="chapters-count">{{ details()?.totalChapters ?? details()?.chapters?.length ?? 0 }} chapters</p>
+        <div class="actions">
+          <button class="primary-btn" (click)="addToLibrary()">Add to Library</button>
+          <button class="secondary-btn" (click)="startReading()">
+            <app-icon name="arrowForward" size="18" /> Start Reading
+          </button>
+        </div>
+      </div>
+    </div>
+
+    @if (details()?.description) {
+      <section class="description">
+        <h2>Description</h2>
+        <p>{{ details()?.description }}</p>
+      </section>
+    }
+
+    <section class="chapters">
+      <h2>Chapters</h2>
+      <app-chapter-list
+        [chapterCount]="details()?.totalChapters ?? 0"
+        [novelId]="novelId()"
+        (chapterSelected)="openReader($event)"
+      />
+    </section>
+  </div>
+}
