@@ -107,7 +107,7 @@ export class OpenLibraryAdapter implements NovelSourceAdapter {
         })
         .filter((r) => r.title && r.title !== 'Untitled');
     } catch (error) {
-      console.error('Open Library search error:', error);
+      //console.error('Open Library search error:', error);
       throw error;
     }
   }
@@ -138,7 +138,7 @@ export class OpenLibraryAdapter implements NovelSourceAdapter {
         chapters: [],
       };
     } catch (error) {
-      console.error('Open Library details error:', error);
+      //console.error('Open Library details error:', error);
       throw error;
     }
   }
@@ -183,7 +183,7 @@ export class OpenLibraryAdapter implements NovelSourceAdapter {
         isContentAvailable: true,
       }];
     } catch (error) {
-      console.error('Open Library chapters error:', error);
+      //console.error('Open Library chapters error:', error);
       return [];
     }
   }

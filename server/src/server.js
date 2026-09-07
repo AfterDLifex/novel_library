@@ -69,7 +69,7 @@ app.get('/api/search', async (req, res) => {
     cacheSet(cacheKey, results);
     res.json(results);
   } catch (err) {
-    console.error(`[search] ${source} "${q}":`, err.message);
+    // console.error(`[search] ${source} "${q}":`, err.message);
     res.status(502).json({ error: `Search failed for "${source}": ${err.message}` });
   }
 });
@@ -89,7 +89,7 @@ app.get('/api/details', async (req, res) => {
     cacheSet(cacheKey, details);
     res.json(details);
   } catch (err) {
-    console.error(`[details] ${source} ${id}:`, err.message);
+    //console.error(`[details] ${source} ${id}:`, err.message);
     res.status(502).json({ error: `Details failed for "${source}/${id}": ${err.message}` });
   }
 });
@@ -109,7 +109,7 @@ app.get('/api/chapters', async (req, res) => {
     cacheSet(cacheKey, chapters);
     res.json(chapters);
   } catch (err) {
-    console.error(`[chapters] ${source} ${id}:`, err.message);
+    //console.error(`[chapters] ${source} ${id}:`, err.message);
     res.status(502).json({ error: `Chapters failed for "${source}/${id}": ${err.message}` });
   }
 });
@@ -129,7 +129,7 @@ app.get('/api/chapter-content', async (req, res) => {
     cacheSet(cacheKey, content);
     res.json(content);
   } catch (err) {
-    console.error(`[chapter-content] ${source} ${novelId} ${chapterId}:`, err.message);
+    //console.error(`[chapter-content] ${source} ${novelId} ${chapterId}:`, err.message);
     res.status(502).json({ error: `Chapter content failed: ${err.message}` });
   }
 });
@@ -149,7 +149,7 @@ app.get('/api/comments', async (req, res) => {
     cacheSet(cacheKey, comments);
     res.json(comments);
   } catch (err) {
-    console.error(`[comments] ${source} ${id}:`, err.message);
+    //console.error(`[comments] ${source} ${id}:`, err.message);
     res.status(502).json({ error: `Comments failed for "${source}/${id}": ${err.message}` });
   }
 });
@@ -160,6 +160,6 @@ app.use('/api', (_req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Novel Library proxy server running at http://localhost:${PORT}`);
-  console.log(`Sources: ${listSources().map((s) => s.id).join(', ')}`);
+  //console.log(`Novel Library proxy server running at http://localhost:${PORT}`);
+  //console.log(`Sources: ${listSources().map((s) => s.id).join(', ')}`);
 });

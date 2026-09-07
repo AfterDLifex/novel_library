@@ -41,15 +41,21 @@ export class SearchCoordinatorService {
   readonly activeSourceIds = this._activeSourceIds.asReadonly();
 
   constructor(
+    private settings: SettingsService,
     private cache: LocalCacheService,
-    private settings: SettingsService
   ) {
     // Reliable, dependency-free stable defaults: always registered + active, so the app
     // works out-of-the-box with free JSON APIs (no local proxy, no API key).
     this.registerSource(new OpenLibraryAdapter());
     this.registerSource(new GutendexAdapter());
 
-    // Register online sources: via backend proxy if enabled, direct otherwise.
+        // Ensure at least one source is active: default source when none selected
+    if (this._activeSourceIds().size === 0) {
+      const def = this.settings.settings().defaultSourceId || 'openlibrary';
+      if (this._sources().some(s => s.id === def)) {
+        this._activeSourceIds.update(set => new Set(set).add(def));
+      }
+    }
     this.registerOnlineSources();
 
     // Re-sync adapters whenever the backend proxy setting changes.
@@ -231,6 +237,7 @@ export class SearchCoordinatorService {
 
     const details = await source.getNovelDetails(sourceNovelId);
     await this.cache.set(cacheKey, details, sourceId);
+    //console.log(`[SearchCoordinator] Fetched novel details for ${sourceId}:${sourceNovelId}`);
     return details;
   }
 
@@ -245,6 +252,7 @@ export class SearchCoordinatorService {
 
     const chapters = await source.getChapters!(sourceNovelId);
     await this.cache.set(cacheKey, chapters, sourceId);
+    //console.log(`[SearchCoordinator] Fetched chapters for ${sourceId}:${sourceNovelId}`);
     return chapters;
   }
 

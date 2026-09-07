@@ -70,7 +70,7 @@ export class GutendexAdapter implements NovelSourceAdapter {
         downloadCount: book.download_count
       }));
     } catch (error) {
-      console.error('Gutendex search error:', error);
+      //console.error('Gutendex search error:', error);
       throw error;
     }
   }
@@ -108,7 +108,7 @@ export class GutendexAdapter implements NovelSourceAdapter {
         chapters: []
       };
     } catch (error) {
-      console.error('Gutendex details error:', error);
+      //console.error('Gutendex details error:', error);
       throw error;
     }
   }
@@ -129,7 +129,7 @@ export class GutendexAdapter implements NovelSourceAdapter {
         isContentAvailable: true
       }];
     } catch (error) {
-      console.error('Gutendex chapters error:', error);
+      //console.error('Gutendex chapters error:', error);
       return [];
     }
   }
@@ -155,7 +155,7 @@ export class GutendexAdapter implements NovelSourceAdapter {
       
       return 'Text version not available. Please read on Project Gutenberg website.';
     } catch (error) {
-      console.error('Error fetching chapter content:', error);
+      //console.error('Error fetching chapter content:', error);
       return 'Error loading content.';
     }
   }
