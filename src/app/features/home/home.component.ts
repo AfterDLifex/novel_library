@@ -20,8 +20,8 @@ import { LibraryStore } from '../library/library.store';
           <app-novel-card
             *ngFor="let item of store.continueReading()"
             [novel]="item"
-            [progressChapterNum]="item.progress?.chapterNumber ?? null"
-            [progressPercentNum]="item.progress?.progressPercent ?? 0"
+            
+            
           />
         </div>
       </section>
@@ -49,8 +49,8 @@ import { LibraryStore } from '../library/library.store';
           <app-novel-card
             *ngFor="let item of store.recentAdditions()"
             [novel]="item"
-            [progressChapterNum]="item.progress?.chapterNumber ?? null"
-            [progressPercentNum]="item.progress?.progressPercent ?? 0"
+            
+            
           />
         </div>
         <ng-template #empty>
@@ -60,7 +60,7 @@ import { LibraryStore } from '../library/library.store';
             message="Search for novels and add them to your library to get started."
           >
             <a routerLink="/search" class="action-btn">
-              <app-icon name="search" size="18" />
+              <app-icon name="search" [size]="18" />
               Search Novels
             </a>
           </app-empty-state>

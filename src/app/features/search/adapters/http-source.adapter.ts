@@ -1,4 +1,4 @@
-﻿import { NovelSearchResult, NovelDetails, Chapter } from '../../../models';
+﻿import { NovelSearchResult, NovelDetails, Chapter, Novel } from '../../../models';
 import { NovelSourceAdapter, SourceConfig } from './source.interface';
 
 /**

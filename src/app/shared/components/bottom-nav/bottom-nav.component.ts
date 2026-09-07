@@ -2,10 +2,11 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { IconComponent } from '../icon/icon.component';
+import { IconName } from '../icon/icon.component';
 
 interface NavItem {
   label: string;
-  icon: string;
+  icon: IconName;
   path: string;
 }
 
@@ -20,7 +21,7 @@ interface NavItem {
         [routerLinkActiveOptions]="{ exact: true }"
         class="nav-item"
       >
-        <app-icon [name]="item.icon" size="22" />
+        <app-icon [name]="item.icon" [size]="22" />
         <span>{{ item.label }}</span>
       </a>
     </nav>

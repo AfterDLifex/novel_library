@@ -16,7 +16,7 @@ export function hashString(str: string): number {
  * Serializes the object in a deterministic order before hashing.
  */
 export function hashObject(obj: unknown): number {
-  const json = JSON.stringify(obj, Object.keys(obj).sort());
+  const json = JSON.stringify(obj, Object.keys(obj as object).sort());
   return hashString(json);
 }
 

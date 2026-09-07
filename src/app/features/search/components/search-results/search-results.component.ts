@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { NovelSearchResult } from '../../../../models';
 import { CoverImageComponent } from '../../../../shared/components/cover-image/cover-image.component';
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
@@ -28,9 +29,9 @@ import { IconComponent } from '../../../../shared/components/icon/icon.component
         aria-label="Add to library"
       >
         @if (inLibrary) {
-          <app-icon name="check" size="18" />
+          <app-icon name="check" [size]="18" />
         } @else {
-          <app-icon name="addCircle" size="18" />
+          <app-icon name="addCircle" [size]="18" />
         }
       </button>
     </div>
@@ -75,7 +76,7 @@ import { IconComponent } from '../../../../shared/components/icon/icon.component
     .add-btn:disabled { cursor: default; opacity: 0.6; }
   `],
   standalone: true,
-  imports: [CommonModule, CoverImageComponent, IconComponent],
+  imports: [CommonModule, RouterLink, CoverImageComponent, IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SearchResultCardComponent {

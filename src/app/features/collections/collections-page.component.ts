@@ -14,7 +14,7 @@ import { DatabaseService } from '../../core/database/database.service';
       <header class="page-header">
         <h1>Collections</h1>
         <button class="add-btn" (click)="startNew()">
-          <app-icon name="add" size="18" /> New Collection
+          <app-icon name="add" [size]="18" /> New Collection
         </button>
       </header>
 
@@ -23,7 +23,7 @@ import { DatabaseService } from '../../core/database/database.service';
           <div class="collection-header">
             <h3>{{ col.name }}</h3>
             <button class="menu-btn" (click)="delete(col)">
-              <app-icon name="delete" size="16" />
+              <app-icon name="delete" [size]="16" />
             </button>
           </div>
           <p class="desc" *ngIf="col.description">{{ col.description }}</p>
@@ -43,8 +43,8 @@ import { DatabaseService } from '../../core/database/database.service';
         <div class="overlay" (click)="editing.set(false)">
           <div class="dialog" (click)="$event.stopPropagation()">
             <h3>{{ editingCollection()?.id ? 'Edit' : 'New' }} Collection</h3>
-            <input type="text" placeholder="Name" [(ngModel)]="editingCollection().name" />
-            <textarea placeholder="Description (optional)" [(ngModel)]="editingCollection().description"></textarea>
+            <input type="text" placeholder="Name" [(ngModel)]="editingCollection()!.name" />
+            <textarea placeholder="Description (optional)" [(ngModel)]="editingCollection()!.description"></textarea>
             <div class="dialog-actions">
               <button class="secondary-btn" (click)="editing.set(false)">Cancel</button>
               <button class="primary-btn" (click)="save()">Save</button>

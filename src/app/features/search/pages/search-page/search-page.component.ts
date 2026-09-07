@@ -19,7 +19,7 @@ import { NovelSearchResult } from '../../../../models';
     <div class="search-page">
       <header class="search-header">
         <div class="search-box">
-          <app-icon name="search" size="20" />
+          <app-icon name="search" [size]="20" />
           <input type="text" [(ngModel)]="query" (input)="onQueryChange()"
             placeholder="Search novels..." autocomplete="off" />
         </div>
@@ -32,7 +32,7 @@ import { NovelSearchResult } from '../../../../models';
 
       @if (errors().size > 0 && !loading()) {
         <div class="source-errors">
-          @for (entry of errorsArray(); entry; track $index) {
+          @for (entry of errorsArray(); track $index) {
             <app-error-message [message]="'Source error: ' + entry[1]" />
           }
         </div>

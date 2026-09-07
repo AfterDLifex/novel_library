@@ -23,7 +23,7 @@ import { CoverImageComponent } from '../cover-image/cover-image.component';
         </div>
       </div>
       @if (novel.favorite) {
-        <app-icon name="star" size="16" class="favorite-icon" />
+        <app-icon name="star" [size]="16" class="favorite-icon" />
       }
     </a>
   `,

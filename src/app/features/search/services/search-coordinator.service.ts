@@ -4,11 +4,11 @@ import {
   NovelDetails,
   Chapter,
 } from '../../../models';
-import { NovelSourceAdapter, SourceConfig } from './adapters/source.interface';
-import { HttpSourceAdapter } from './adapters/http-source.adapter';
 import { LocalCacheService } from '../../../core/storage/local-cache.service';
 import { normalizeTitle } from '../../../core/utils/normalize.util';
 import { generateNovelId } from '../../../core/utils/id.util';
+import { NovelSourceAdapter, SourceConfig } from '../adapters/source.interface';
+import { HttpSourceAdapter } from '../adapters/http-source.adapter';
 
 /**
  * Search coordinator that manages multiple source adapters.

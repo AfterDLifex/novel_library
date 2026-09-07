@@ -28,10 +28,10 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
         </div>
         <div class="view-controls">
           <button class="view-btn" (click)="toggleFavorites()" [class.active]="showFavoritesOnly()">
-            <app-icon [name]="showFavoritesOnly() ? 'star' : 'starBorder'" size="18" />
+            <app-icon [name]="showFavoritesOnly() ? 'star' : 'starBorder'" [size]="18" />
           </button>
           <button class="view-btn" routerLink="/search">
-            <app-icon name="search" size="18" />
+            <app-icon name="search" [size]="18" />
           </button>
         </div>
       </header>
@@ -44,7 +44,7 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
             message="Search for novels and add them to your library."
           >
             <a routerLink="/search" class="action-btn">
-              <app-icon name="search" size="18" /> Search Novels
+              <app-icon name="search" [size]="18" /> Search Novels
             </a>
           </app-empty-state>
         } @else {
@@ -52,8 +52,8 @@ import { LoadingSpinnerComponent } from '../../../../shared/components/loading-s
             <app-novel-card
               *ngFor="let item of filteredItems()"
               [novel]="item"
-              [progressChapterNum]="item.progress?.chapterNumber ?? null"
-              [progressPercentNum]="item.progress?.progressPercent ?? 0"
+              
+              
             />
           </div>
           @if (filteredItems().length === 0) {

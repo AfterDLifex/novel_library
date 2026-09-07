@@ -23,7 +23,7 @@ import { DatabaseService } from '../../core/database/database.service';
           <app-cover-image [src]="getItemCover(item)" [alt]="getItemTitle(item)" [aspectRatio]="'1/1'" />
           <div class="info">
             <h3>{{ getItemTitle(item) }}</h3>
-            <p class="chapter">{{ item.chapterTitle }}</p>
+            <p class="chapter">{{ item.title }}</p>
             <p class="meta">
               <span>Ch. {{ item.chapterNumber }}</span>
               <span>· {{ item.createdAt | dateAgo }}</span>
@@ -33,7 +33,7 @@ import { DatabaseService } from '../../core/database/database.service';
             }
           </div>
           <button class="delete-btn" (click)="delete(item)" title="Delete bookmark">
-            <app-icon name="delete" size="18" />
+            <app-icon name="delete" [size]="18" />
           </button>
         </div>
       </cdk-virtual-scroll-viewport>
@@ -82,9 +82,9 @@ export class BookmarksPageComponent {
   }
 
   async load() {
-    const bookmarks = await this.db.bookmarks.toArray();
+    const bookmarks = await this.db.getAllBookmarks();
     this.items.set(bookmarks);
-    const novelIds = [...new Set(bookmarks.map((b) => b.novelId))];
+    const novelIds = [...new Set(bookmarks.map((b: Bookmark) => b.novelId))];
     const novelMap = new Map<string, Novel>();
     for (const id of novelIds) {
       const n = await this.db.getNovel(id);
@@ -94,7 +94,7 @@ export class BookmarksPageComponent {
   }
 
   getItemTitle(item: Bookmark): string {
-    return this.novels().get(item.novelId)?.title ?? item.chapterTitle;
+    return this.novels().get(item.novelId)?.title ?? item.title;
   }
 
   getItemCover(item: Bookmark): string | undefined {

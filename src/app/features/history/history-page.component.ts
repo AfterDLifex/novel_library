@@ -15,7 +15,7 @@ import { DatabaseService } from '../../core/database/database.service';
       <header class="page-header">
         <h1>History</h1>
         <button class="clear-btn" (click)="clearAll()" *ngIf="items().length > 0" title="Clear history">
-          <app-icon name="delete" size="18" /> Clear
+          <app-icon name="delete" [size]="18" /> Clear
         </button>
       </header>
 
@@ -85,7 +85,7 @@ export class HistoryPageComponent {
 
   async clearAll() {
     if (!confirm('Are you sure you want to clear all reading history?')) return;
-    await this.db.history.clear();
+    await this.db.clearHistory();
     await this.load();
   }
 }

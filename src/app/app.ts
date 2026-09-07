@@ -17,11 +17,11 @@ import { AuthStateService } from './core/auth/auth-state.service';
         <div class="header-actions">
           @if (auth.authenticated()) {
             <button class="sync-btn" (click)="sync()" [disabled]="syncing()">
-              <app-icon name="cloudSync" size="20" />
+              <app-icon name="cloudSync" [size]="20" />
             </button>
           }
           <button class="theme-btn" (click)="toggleTheme()" aria-label="Toggle theme">
-                        <app-icon [name]="isDark() ? 'visibility' : 'settings'" size="20" />
+                        <app-icon [name]="isDark() ? 'visibility' : 'settings'" [size]="20" />
           </button>
         </div>
       </header>
@@ -93,7 +93,7 @@ export class App {
     private settings: SettingsService,
     private syncEngine: SyncEngineService,
     public auth: AuthStateService
-  ) {}
+  ) { }
 
   async toggleTheme() {
     const current = this.settings.settings().reader.theme;

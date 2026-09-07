@@ -1,12 +1,13 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IconComponent } from '../icon/icon.component';
+import { IconName } from '../icon/icon.component';
 
 @Component({
   selector: 'app-empty-state',
   template: `
     <div class="empty">
-      <app-icon [name]="icon" [size]="48" />
+      <app-icon [name]="icon" [size]="48"></app-icon>
       <h3>{{ title }}</h3>
       @if (message) {
         <p>{{ message }}</p>
@@ -31,7 +32,7 @@ import { IconComponent } from '../icon/icon.component';
   imports: [CommonModule, IconComponent],
 })
 export class EmptyStateComponent {
-  @Input() icon: string = 'library';
+  @Input() icon: IconName = 'library';
   @Input() title: string = 'Nothing here yet';
   @Input() message: string = '';
 }

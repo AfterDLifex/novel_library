@@ -22,7 +22,7 @@ import { ScrollShadowDirective } from '../../../shared/directives/scroll-shadow.
           >
             <span class="num">Ch. {{ chapter.number }}</span>
             <span class="title">{{ chapter.title }}</span>
-            <app-icon *ngIf="readChapters.has(chapter.id)" name="check" size="16" class="read-icon" />
+            <app-icon *ngIf="readChapters.has(chapter.id)" name="check" [size]="16" class="read-icon" />
           </div>
         </cdk-virtual-scroll-viewport>
       }
