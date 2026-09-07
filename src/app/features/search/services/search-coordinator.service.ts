@@ -12,6 +12,7 @@ import { HttpSourceAdapter } from '../adapters/http-source.adapter';
 import { JsonApiAdapter } from '../adapters/json-api.adapter';
 import { NOVEL_SOURCES } from '../adapters/source-registry';
 import { GutendexAdapter } from '../adapters/gutendex.adapter';
+import { OpenLibraryAdapter } from '../adapters/open-library.adapter';
 import { BackendSearchAdapter } from '../adapters/backend-search.adapter';
 import { SettingsService } from '../../../core/storage/settings.service';
 import { effect } from '@angular/core';
@@ -40,13 +41,21 @@ export class SearchCoordinatorService {
   readonly activeSourceIds = this._activeSourceIds.asReadonly();
 
   constructor(
+    private settings: SettingsService,
     private cache: LocalCacheService,
-    private settings: SettingsService
   ) {
-    // Register the Gutendex adapter (works directly from the browser)
+    // Reliable, dependency-free stable defaults: always registered + active, so the app
+    // works out-of-the-box with free JSON APIs (no local proxy, no API key).
+    this.registerSource(new OpenLibraryAdapter());
     this.registerSource(new GutendexAdapter());
 
-    // Register online sources: via backend proxy if enabled, direct otherwise.
+        // Ensure at least one source is active: default source when none selected
+    if (this._activeSourceIds().size === 0) {
+      const def = this.settings.settings().defaultSourceId || 'openlibrary';
+      if (this._sources().some(s => s.id === def)) {
+        this._activeSourceIds.update(set => new Set(set).add(def));
+      }
+    }
     this.registerOnlineSources();
 
     // Re-sync adapters whenever the backend proxy setting changes.
@@ -57,7 +66,9 @@ export class SearchCoordinatorService {
 
   private registerOnlineSources(): void {
     for (const config of NOVEL_SOURCES) {
-      // Skip sources registered by the backend proxy sync below.
+      // Direct-registered adapters are handled separately — avoid double-registration.
+      if (config.id === 'openlibrary' || config.id === 'gutendex') continue;
+      // Skip sources swapped to backend adapters when the proxy is enabled.
       if (this.settings.settings().backendProxyEnabled) break;
       this.registerFromConfig(config);
     }
@@ -98,7 +109,7 @@ export class SearchCoordinatorService {
         }
       }
       for (const config of NOVEL_SOURCES) {
-        if (config.id === 'gutendex') continue;
+        if (config.id === 'gutendex' || config.id === 'openlibrary') continue;
         if (!this._sources().some((a) => a.id === config.id)) {
           this.registerFromConfig(config);
         }
@@ -107,9 +118,11 @@ export class SearchCoordinatorService {
   }
 
 
-  registerSource(adapter: NovelSourceAdapter): void {
+  registerSource(adapter: NovelSourceAdapter, activeByDefault = adapter.stable !== false): void {
     this._sources.update((s) => [...s, adapter]);
-    this._activeSourceIds.update((set) => new Set(set).add(adapter.id));
+    if (activeByDefault) {
+      this._activeSourceIds.update((set) => new Set(set).add(adapter.id));
+    }
   }
 
   registerFromConfig(config: SourceConfig): void {
@@ -117,7 +130,9 @@ export class SearchCoordinatorService {
     const adapter = config.isJsonApi 
       ? new JsonApiAdapter(config) 
       : new HttpSourceAdapter(config);
-    this.registerSource(adapter);
+    // Non-stable (scraping/protected) sources stay registered but inactive so a
+    // normal search doesn't hammer them and flood the UI with bot-block errors.
+    this.registerSource(adapter, config.stable !== false);
   }
 
   unregisterSource(sourceId: string): void {
@@ -222,6 +237,7 @@ export class SearchCoordinatorService {
 
     const details = await source.getNovelDetails(sourceNovelId);
     await this.cache.set(cacheKey, details, sourceId);
+    //console.log(`[SearchCoordinator] Fetched novel details for ${sourceId}:${sourceNovelId}`);
     return details;
   }
 
@@ -236,6 +252,7 @@ export class SearchCoordinatorService {
 
     const chapters = await source.getChapters!(sourceNovelId);
     await this.cache.set(cacheKey, chapters, sourceId);
+    //console.log(`[SearchCoordinator] Fetched chapters for ${sourceId}:${sourceNovelId}`);
     return chapters;
   }
 

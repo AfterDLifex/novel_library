@@ -126,6 +126,7 @@ export interface AppSettings {
   backendProxyEnabled?: boolean;
   /** Base URL of the backend proxy server (default http://localhost:5000). */
   backendProxyUrl?: string;
+  defaultSourceId?: string;
 }
 
 export interface SyncOperation {
