@@ -23,9 +23,10 @@ const DEFAULT_SETTINGS: AppSettings = {
   navigation: DEFAULT_NAVIGATION_SETTINGS,
   syncEnabled: false,
   deviceId: generateDeviceId(),
-  // Stable defaults (Open Library, Gutendex) work directly from the browser
-  // with no local server — the proxy is an opt-in for the scraping sources.
-  defaultSourceId: 'openlibrary',
+  // Gutendex is the default: it works directly from the browser (no proxy, no API key)
+  // and provides actual readable full text — not just metadata.
+  defaultSourceId: 'gutendex',
+  enabledSourceIds: ['gutendex'],
   backendProxyEnabled: false,
   backendProxyUrl: 'http://localhost:5000',
 };

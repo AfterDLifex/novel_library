@@ -13,6 +13,7 @@ import { JsonApiAdapter } from '../adapters/json-api.adapter';
 import { NOVEL_SOURCES } from '../adapters/source-registry';
 import { GutendexAdapter } from '../adapters/gutendex.adapter';
 import { OpenLibraryAdapter } from '../adapters/open-library.adapter';
+import { WikisourceAdapter } from '../adapters/wikisource.adapter';
 import { BackendSearchAdapter } from '../adapters/backend-search.adapter';
 import { SettingsService } from '../../../core/storage/settings.service';
 import { effect } from '@angular/core';
@@ -22,6 +23,8 @@ const DEFAULT_BACKEND_URL = 'http://localhost:5000';
 /**
  * Search coordinator that manages multiple source adapters.
  * Uses Promise.allSettled for error isolation, normalizes and deduplicates results.
+ * Active sources are seeded from settings.enabledSourceIds and kept in sync via
+ * the setEnabledSources() method (called by the Settings page).
  */
 @Injectable({ providedIn: 'root' })
 export class SearchCoordinatorService {
@@ -44,19 +47,24 @@ export class SearchCoordinatorService {
     private settings: SettingsService,
     private cache: LocalCacheService,
   ) {
-    // Reliable, dependency-free stable defaults: always registered + active, so the app
-    // works out-of-the-box with free JSON APIs (no local proxy, no API key).
-    this.registerSource(new OpenLibraryAdapter());
+    // Register all stable direct adapters first.
     this.registerSource(new GutendexAdapter());
-
-        // Ensure at least one source is active: default source when none selected
-    if (this._activeSourceIds().size === 0) {
-      const def = this.settings.settings().defaultSourceId || 'openlibrary';
-      if (this._sources().some(s => s.id === def)) {
-        this._activeSourceIds.update(set => new Set(set).add(def));
-      }
-    }
+    this.registerSource(new WikisourceAdapter());
+    this.registerSource(new OpenLibraryAdapter());
     this.registerOnlineSources();
+
+    // Seed active sources from persisted settings, or fall back to the default
+    // single source (gutendex) so the app always starts with exactly one source.
+    const savedIds = this.settings.settings().enabledSourceIds;
+    if (savedIds && savedIds.length > 0) {
+      // Activate exactly the saved set (only for registered sources)
+      const registered = new Set(this._sources().map(s => s.id));
+      this._activeSourceIds.set(new Set(savedIds.filter(id => registered.has(id))));
+    } else {
+      // Fallback: activate the single default source
+      const def = this.settings.settings().defaultSourceId || 'gutendex';
+      this._activeSourceIds.set(new Set([def]));
+    }
 
     // Re-sync adapters whenever the backend proxy setting changes.
     effect(() => {
@@ -64,10 +72,11 @@ export class SearchCoordinatorService {
     });
   }
 
+
   private registerOnlineSources(): void {
     for (const config of NOVEL_SOURCES) {
       // Direct-registered adapters are handled separately — avoid double-registration.
-      if (config.id === 'openlibrary' || config.id === 'gutendex') continue;
+      if (config.id === 'openlibrary' || config.id === 'gutendex' || config.id === 'wikisource') continue;
       // Skip sources swapped to backend adapters when the proxy is enabled.
       if (this.settings.settings().backendProxyEnabled) break;
       this.registerFromConfig(config);
@@ -109,7 +118,7 @@ export class SearchCoordinatorService {
         }
       }
       for (const config of NOVEL_SOURCES) {
-        if (config.id === 'gutendex' || config.id === 'openlibrary') continue;
+        if (config.id === 'gutendex' || config.id === 'openlibrary' || config.id === 'wikisource') continue;
         if (!this._sources().some((a) => a.id === config.id)) {
           this.registerFromConfig(config);
         }
@@ -155,6 +164,16 @@ export class SearchCoordinatorService {
     } else {
       this._activeSourceIds.update((set) => new Set(set).add(sourceId));
     }
+  }
+
+  /**
+   * Set the full list of enabled source IDs from Settings and persist to DB.
+   * Ensures at least one source (gutendex) is always active.
+   */
+  async setEnabledSources(ids: string[]): Promise<void> {
+    const safeIds = ids.length > 0 ? ids : ['gutendex'];
+    this._activeSourceIds.set(new Set(safeIds));
+    await this.settings.update({ enabledSourceIds: safeIds });
   }
 
   getSourceName(sourceId: string): string {

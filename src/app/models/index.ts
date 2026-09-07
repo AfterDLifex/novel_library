@@ -126,7 +126,16 @@ export interface AppSettings {
   backendProxyEnabled?: boolean;
   /** Base URL of the backend proxy server (default http://localhost:5000). */
   backendProxyUrl?: string;
+  /** Default source for metadata searches */
   defaultSourceId?: string;
+  /** Default source for full readable content */
+  defaultReadableSourceId?: string;
+  /**
+   * IDs of all sources the user has explicitly enabled.
+   * When set, the SearchCoordinator activates exactly these sources on startup.
+   * When undefined, the coordinator falls back to its built-in stable defaults.
+   */
+  enabledSourceIds?: string[];
 }
 
 export interface SyncOperation {

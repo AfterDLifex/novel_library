@@ -15,11 +15,16 @@ export interface SourceConfig {
   /**
    * True for reliable, dependency-free sources that are enabled by default
    * (stable JSON APIs reachable directly from the browser, e.g. Gutendex,
-   * Open Library). False for sources that scrape sites behind bot protection
+   * Wikisource). False for sources that scrape sites behind bot protection
    * and may fail — these stay available in the source filters but are OFF by
    * default so they don't spam errors on a normal search.
    */
   stable?: boolean;
+  /**
+   * True when this source can deliver the actual full readable text of a book
+   * (e.g. Gutendex plain text, Wikisource HTML). False for metadata-only sources.
+   */
+  providesFullText?: boolean;
 }
 
 /** Adapter interface for novel search sources. */
@@ -29,6 +34,8 @@ export interface NovelSourceAdapter {
   readonly isContentPermitted: boolean;
   /** Reliable defaults are active out-of-the-box; scraping sources default to OFF. */
   readonly stable?: boolean;
+  /** Whether this source delivers full readable text (not just metadata). */
+  readonly providesFullText?: boolean;
   search(query: string): Promise<NovelSearchResult[]>;
   getNovelDetails(novelId: string): Promise<NovelDetails>;
   getChapters?(novelId: string): Promise<Chapter[]>;

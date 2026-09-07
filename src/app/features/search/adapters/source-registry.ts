@@ -31,7 +31,7 @@ export const NOVEL_SOURCES: SourceConfig[] = [
     stable: true
   },
   // Gutendex / Project Gutenberg - Free public domain books via JSON API.
-  // Reliable default; direct from browser, works even when scraping sources fail.
+  // Default readable source; direct from browser, works even when scraping sources fail.
   {
     id: 'gutendex',
     name: 'Project Gutenberg (Gutendex)',
@@ -41,7 +41,22 @@ export const NOVEL_SOURCES: SourceConfig[] = [
     isContentPermitted: true,
     headers: { 'Accept': 'application/json' },
     isJsonApi: true,
-    stable: true
+    stable: true,
+    providesFullText: true,
+  },
+  // Wikisource - MediaWiki-based public-domain full-text library.
+  // Provides parsed HTML of entire book pages and sub-chapter pages directly.
+  {
+    id: 'wikisource',
+    name: 'Wikisource (Classic Literature)',
+    baseUrl: 'https://en.wikisource.org',
+    searchEndpoint: '/w/api.php?action=query&list=search&srsearch={query}&format=json&origin=*',
+    detailsEndpoint: '/w/api.php?action=parse&page={id}&prop=text&format=json&origin=*',
+    isContentPermitted: true,
+    headers: { 'Accept': 'application/json' },
+    isJsonApi: true,
+    stable: true,
+    providesFullText: true,
   },
   // HTML scraping-based sources below are kept selectable by the user, but are NOT
   // enabled by default because many sit behind bot protection (Cloudflare) and fail.
