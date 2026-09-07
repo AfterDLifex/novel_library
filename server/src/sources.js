@@ -6,29 +6,60 @@
 const cheerio = require('cheerio');
 
 const BROWSER_UA =
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
 
 const DEFAULT_HEADERS = {
   'User-Agent': BROWSER_UA,
-  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
   'Accept-Language': 'en-US,en;q=0.9',
+  'Upgrade-Insecure-Requests': '1',
+  'sec-ch-ua': '"Google Chrome";v="131", "Chromium";v="131"',
+  'sec-ch-ua-mobile': '?0',
+  'sec-ch-ua-platform': '"Windows"',
+  'Sec-Fetch-Dest': 'document',
+  'Sec-Fetch-Mode': 'navigate',
+  'Sec-Fetch-Site': 'same-origin',
+  'Sec-Fetch-User': '?1',
 };
 
-/** Fetch a URL with timeout and browser-like headers. */
-async function fetchPage(url, headers = {}) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 15000);
-  try {
-    const res = await fetch(url, {
-      headers: { ...DEFAULT_HEADERS, ...headers },
-      signal: controller.signal,
-      redirect: 'follow',
-    });
-    return res;
-  } finally {
-    clearTimeout(timer);
+/** Fetch a URL with timeout, browser-like headers, and one automatic retry. */
+async function fetchPage(url, headers = {}, retries = 1) {
+  const attempt = async () => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 15000);
+    try {
+      const origin = new URL(url).origin;
+      return await fetch(url, {
+        headers: { ...DEFAULT_HEADERS, ...headers, Referer: origin + '/' },
+        signal: controller.signal,
+        redirect: 'follow',
+      });
+    } finally {
+      clearTimeout(timer);
+    }
+  };
+
+  let lastRes;
+  for (let i = 0; i <= retries; i++) {
+    lastRes = await attempt();
+    // Retry once on transient failures (429 / 5xx).
+    if (lastRes.status !== 429 && !(lastRes.status >= 500)) break;
+    await new Promise((r) => setTimeout(r, 800 * (i + 1)));
   }
+  return lastRes;
 }
+
+/** Human-friendly error for blocked/failed fetches. */
+function fetchError(url, status) {
+  if (status === 403 || status === 503) {
+    return 'This source is protected by Cloudflare bot protection and cannot be fetched automatically right now. Please try another source.';
+  }
+  if (status === 429) {
+    return 'Rate limited by this source — please wait a moment and try again.';
+  }
+  return `Source returned HTTP ${status}`;
+}
+
 
 function clean(text) {
   return (text || '').replace(/\s+/g, ' ').trim();
@@ -259,6 +290,34 @@ const SOURCES = {
       };
     },
   },
+  gutendex: {
+    id: 'gutendex',
+    name: 'Project Gutenberg (Gutendex)',
+    baseUrl: 'https://gutendex.com',
+    // Official JSON API — public domain books, always reachable.
+    buildSearchUrl: (q) => `https://gutendex.com/books?search=${encodeURIComponent(q)}`,
+    isJsonApi: true,
+    parseSearch: (data) => {
+      if (!data || !Array.isArray(data.results)) return [];
+      return data.results.map((b) => ({
+        id: String(b.id),
+        title: b.title,
+        author: b.authors?.map((a) => a.name).join(', ') || undefined,
+        coverUrl: b.formats?.['image/jpeg'],
+        description: (b.summaries && b.summaries[0]) || undefined,
+        sourceUrl: `https://www.gutenberg.org/ebooks/${b.id}`,
+      }));
+    },
+    buildDetailsUrl: (id) => `https://gutendex.com/books/${encodeURIComponent(id)}`,
+    isJsonDetails: true,
+    parseDetails: (b) => ({
+      title: b.title,
+      description: (b.summaries && b.summaries[0]) || 'No description available.',
+      coverUrl: b.formats?.['image/jpeg'],
+      genres: b.bookshelves || [],
+      sourceUrl: `https://www.gutenberg.org/ebooks/${b.id}`,
+    }),
+  },
 };
 
 function listSources() {
@@ -270,7 +329,7 @@ async function searchSource(sourceId, query) {
   if (!source) throw new Error(`Unknown source: ${sourceId}`);
   const url = source.buildSearchUrl(query);
   const res = await fetchPage(url, source.isJsonApi ? { 'Accept': 'application/json' } : {});
-  if (!res.ok) throw new Error(`Source returned HTTP ${res.status}`);
+  if (!res.ok) throw new Error(fetchError(url, res.status));
   if (source.isJsonApi) {
     return source.parseSearch(await res.json());
   }
@@ -282,10 +341,10 @@ async function getDetails(sourceId, novelId) {
   if (!source) throw new Error(`Unknown source: ${sourceId}`);
   const url = source.buildDetailsUrl(novelId);
   const res = await fetchPage(url, source.isJsonDetails ? { 'Accept': 'application/json' } : {});
-  if (!res.ok) throw new Error(`Source returned HTTP ${res.status}`);
+  if (!res.ok) throw new Error(fetchError(url, res.status));
   if (source.isJsonDetails) {
     const parsed = source.parseDetails(await res.json());
-    return { ...parsed, sourceUrl: `https://ncode.syosetu.com/${novelId}/` };
+    return { ...parsed, sourceUrl: parsed.sourceUrl || `https://ncode.syosetu.com/${novelId}/` };
   }
   return parseGenericDetails(await res.text(), source.baseUrl, source);
 }

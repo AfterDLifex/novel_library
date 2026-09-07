@@ -15,6 +15,8 @@ const DEFAULT_SETTINGS: AppSettings = {
   reader: DEFAULT_READER_SETTINGS,
   syncEnabled: false,
   deviceId: generateDeviceId(),
+  backendProxyEnabled: true,
+  backendProxyUrl: 'http://localhost:5000',
 };
 
 function generateDeviceId(): string {

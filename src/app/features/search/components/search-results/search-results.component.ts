@@ -43,53 +43,66 @@ import { SourceBadgeComponent } from '../source-badge/source-badge.component';
   styles: [`
     .result-card {
       display: flex;
-      gap: 0.75rem;
-      align-items: flex-start;
-      padding: 0.75rem;
-      border-radius: 0.75rem;
+      gap: 0.85rem;
+      align-items: stretch;
+      padding: 0.85rem;
+      border-radius: var(--radius-medium);
       background: var(--md-sys-color-surface);
+      border: 1px solid var(--md-sys-color-outline-variant);
       box-shadow: var(--md-sys-elevation-1);
+      transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+    }
+    .result-card:hover {
+      box-shadow: var(--md-sys-elevation-3);
+      transform: translateY(-1px);
+      border-color: color-mix(in srgb, var(--md-sys-color-primary) 35%, var(--md-sys-color-outline-variant));
     }
     .card-link {
       display: flex;
-      gap: 0.75rem;
+      gap: 0.85rem;
       flex: 1;
+      min-width: 0;
       text-decoration: none;
       color: inherit;
     }
-    app-cover-image { width: 48px; min-width: 48px; }
+    app-cover-image { width: 64px; min-width: 64px; border-radius: 0.5rem; overflow: hidden; }
     .result-info { flex: 1; min-width: 0; }
     .title-row {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 0.5rem;
     }
     h3 {
       font-size: 0.95rem;
       font-weight: 600;
-      margin: 0;
-      white-space: nowrap;
+      margin: 0 0 0.15rem;
+      line-height: 1.3;
       overflow: hidden;
-      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
       flex: 1;
       min-width: 0;
+      color: var(--md-sys-color-on-surface);
     }
-    .author { font-size: 0.8rem; color: var(--md-sys-color-on-surface-variant); margin: 0 0 0.25rem; }
-    .description { font-size: 0.75rem; color: var(--md-sys-color-on-surface-variant); margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .author { font-size: 0.78rem; color: var(--md-sys-color-primary); margin: 0 0 0.3rem; font-weight: 500; }
+    .description { font-size: 0.75rem; line-height: 1.45; color: var(--md-sys-color-on-surface-variant); margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .add-btn {
+      align-self: center;
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
       border: none;
-      border-radius: 0.4rem;
+      border-radius: 50%;
       background: color-mix(in srgb, var(--md-sys-color-primary) 12%, transparent);
       color: var(--md-sys-color-on-surface-variant);
       cursor: pointer;
       transition: all 0.2s;
+      flex-shrink: 0;
     }
-    .add-btn:hover { background: color-mix(in srgb, var(--md-sys-color-primary) 25%, transparent); color: var(--md-sys-color-primary); }
+    .add-btn:hover:not(:disabled) { background: color-mix(in srgb, var(--md-sys-color-primary) 25%, transparent); color: var(--md-sys-color-primary); transform: scale(1.05); }
     .add-btn.added { background: color-mix(in srgb, var(--md-sys-color-secondary) 15%, transparent); color: var(--md-sys-color-secondary); }
     .add-btn:disabled { cursor: default; opacity: 0.6; }
   `],
